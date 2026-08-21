@@ -8,17 +8,16 @@ Sistema web de **controle de ponto e banco de horas** desenvolvido como Trabalho
 
 - **Login com JWT** e recuperação de senha por e-mail (código de verificação)
 - **Dashboard** com visão geral da equipe e saldos do mês
-- **Ficha mensal** de ponto por funcionário
 - **Banco de horas** com saldos calculados automaticamente
 - **Gestão de ponto**: lançamento e ajuste de marcações e ocorrências (atestado, falta, férias etc.)
 - **Fechamento mensal** com bloqueio de edições e exportação em **Excel**
 - **Relatórios em PDF** e impressão de fichas
 - **Envio de fichas por e-mail** para os funcionários
-- **Avisos** internos (gerais, importantes e comemorativos, públicos ou privados) com selo de "Novo"
-- **Funcionários**: cadastro com escala flexível por dia da semana e opção "isento de ponto"
+- **Avisos** internos (gerais, importantes e comemorativos) com selo de "Novo"
+- **Funcionários**: cadastro com escala flexível por dia da semana, opção "isento de ponto" e aba de **Férias** (calendário que abona e trava os dias na Gestão de Ponto)
 - **Setores**: organização e ativação/inativação
 - **Feriados** por ano
-- **Backup do banco**: download, restauração e envio por e-mail
+- **Backup do banco**: download em `.zip` (dump + assinatura SHA-256) e restauração com **verificação de integridade**
 - **Auditoria**: trilha de quem criou, editou ou excluiu cada registro
 - **Perfil** com foto e troca de senha
 - Tema **claro/escuro** e confirmações de segurança com senha para ações críticas
@@ -29,7 +28,7 @@ Sistema web de **controle de ponto e banco de horas** desenvolvido como Trabalho
 | -------- | ------------------------------------------------------------------ |
 | Backend  | Node.js, Express, JWT (jsonwebtoken), bcrypt, dotenv               |
 | Banco    | MySQL 8 (driver mysql2, com prepared statements)                   |
-| Arquivos | ExcelJS (planilhas), PDFKit (relatórios), Nodemailer (e-mails)     |
+| Arquivos | ExcelJS (planilhas), PDFKit (relatórios), Nodemailer (e-mails), adm-zip (backup .zip) |
 | Frontend | HTML, CSS e JavaScript puros (SPA simples, sem frameworks)         |
 
 ## Arquitetura
@@ -101,6 +100,10 @@ CRONASYS-main/
 
    Copie `.env.example` para `.env` e preencha com os dados do seu ambiente (porta, acesso ao MySQL e segredo do JWT). O `.env` não deve ser versionado.
 
+   > **Backup no Windows:** para o download do backup funcionar, informe também o caminho do
+   > `mysqldump` no `.env`. Exemplo com XAMPP:
+   > `MYSQLDUMP_PATH=C:\xampp\mysql\bin\mysqldump.exe`
+
 4. **Inicie o sistema**
 
    ```bash
@@ -128,6 +131,9 @@ O `Banco.sql` cria dois usuários de exemplo (senha: **123**):
 - Ações críticas (backup, exclusões, configuração de e-mail) exigem **confirmação com senha**
 - Consultas ao banco com **prepared statements** (proteção contra SQL Injection)
 - **Auditoria** de criações, edições e exclusões
+- **Integridade do backup**: cada backup é gerado com uma assinatura **SHA-256**; na restauração
+  o hash é recalculado e comparado — se o arquivo tiver sido alterado ou corrompido, a
+  restauração é recusada e o banco não é modificado
 
 ## Documentação adicional
 
