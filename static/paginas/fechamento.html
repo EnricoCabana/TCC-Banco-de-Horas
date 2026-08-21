@@ -1,0 +1,136 @@
+<!-- ================================================
+     paginas/fechamento.html
+     Injetado em <main id="content"> pelo main.js.
+     main.js chama iniciarModuloFechamento() após injetar.
+================================================ -->
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1>Fechamento de Folha</h1>
+      <p>Consolidado mensal de todos os funcionários para a contabilidade</p>
+    </div>
+    <div class="fech-controles">
+      <select id="fechAno" class="form-input"></select>
+      <select id="fechMes" class="form-input"></select>
+      <button class="btn-primary" id="btnFechGerar">
+        <i class="fa-solid fa-table-list"></i> Gerar prévia
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESUMO ─────────────────────────────────── -->
+<div class="card" id="fechResumoCard" style="display:none;margin-bottom:20px;">
+  <div class="fech-status-bar">
+    <span id="fechStatusBadge" class="fech-badge fech-badge-aberto">
+      <i class="fa-solid fa-lock-open"></i> Mês aberto
+    </span>
+    <div class="fech-status-acoes">
+      <button class="fech-btn fech-btn-fechar" id="btnFechFechar">
+        <i class="fa-solid fa-lock"></i> Fechar mês
+      </button>
+      <button class="fech-btn fech-btn-reabrir" id="btnFechReabrir" style="display:none;">
+        <i class="fa-solid fa-lock-open"></i> Reabrir mês
+      </button>
+    </div>
+  </div>
+  <div class="fech-resumo">
+    <div class="fech-kpi">
+      <small>Funcionários</small>
+      <strong id="fechKpiFuncionarios">0</strong>
+    </div>
+    <div class="fech-kpi">
+      <small>Total trabalhado</small>
+      <strong id="fechKpiTotal">00:00</strong>
+    </div>
+    <div class="fech-kpi">
+      <small>Saldo geral do mês</small>
+      <strong id="fechKpiSaldo">+00:00</strong>
+    </div>
+    <div class="fech-kpi-acao">
+      <button class="btn-primary" id="btnFechExcel">
+        <i class="fa-solid fa-file-excel"></i> Baixar Excel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TABELA ─────────────────────────────────── -->
+<div class="card">
+  <div class="fech-toolbar">
+    <strong id="fechTitulo">Selecione o período e clique em “Gerar prévia”.</strong>
+    <span id="fechTotalReg" style="font-size:13px;color:var(--muted-2);"></span>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table id="tabelaFechamento">
+      <thead>
+        <tr>
+          <th>Matrícula</th>
+          <th>Nome</th>
+          <th>Setor</th>
+          <th style="text-align:center;">Dias lançados</th>
+          <th>Horas Trabalhadas</th>
+          <th>Saldo do Mês</th>
+          <th>Saldo Total</th>
+        </tr>
+      </thead>
+      <tbody id="corpoFechamento">
+        <tr>
+          <td colspan="7" class="fech-vazia">
+            <i class="fa-regular fa-calendar-check"></i>
+            <p>Nenhuma prévia gerada ainda.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── ESTILOS LOCAIS ─────────────────────────── -->
+<style>
+  .fech-controles { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .fech-controles .form-input { width:auto; }
+
+  .fech-resumo { display:grid; grid-template-columns:repeat(3,1fr) auto; gap:16px; align-items:center; }
+  .fech-kpi { display:flex; flex-direction:column; gap:4px; }
+  .fech-kpi small { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted-2); }
+  .fech-kpi strong { font-size:22px; color:var(--text); font-family:'Courier New',monospace; }
+  .fech-kpi-acao { display:flex; justify-content:flex-end; }
+
+  .fech-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .fech-status-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-bottom:14px; margin-bottom:14px; border-bottom:1px solid var(--border); }
+  .fech-badge { font-size:13px; font-weight:700; padding:6px 12px; border-radius: 0; display:inline-flex; align-items:center; gap:7px; }
+  .fech-badge-aberto { background:var(--tint-green); color:var(--fg-green); border:1px solid var(--tint-green); }
+  .fech-badge-fechado { background:var(--tint-amber); color:var(--fg-amber); border:1px solid #fcd34d; }
+  .fech-status-acoes { display:flex; gap:8px; }
+  .fech-btn { border:none; border-radius: 0; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:filter .15s; }
+  .fech-btn:hover { filter:brightness(0.95); }
+  .fech-btn:disabled { opacity:.6; cursor:not-allowed; }
+  .fech-btn-fechar { background:#b45309; color:#fff; }
+  .fech-btn-reabrir { background:var(--surface); color:var(--text-soft); border:1px solid var(--border-strong); }
+
+  #tabelaFechamento { width:100%; border-collapse:collapse; font-size:14px; }
+  #tabelaFechamento thead th {
+    text-align:left; padding:10px 14px; font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+    border-bottom:2px solid var(--surface-3); background:var(--surface-2); white-space:nowrap;
+  }
+  #tabelaFechamento tbody tr { border-bottom:1px solid var(--surface-3); }
+  #tabelaFechamento tbody tr:hover { background:var(--surface-2); }
+  #tabelaFechamento tbody td { padding:12px 14px; color:var(--text-soft); vertical-align:middle; }
+  #tabelaFechamento .col-mono { font-family:'Courier New',monospace; font-size:13px; }
+  .fech-saldo-pos { color:#16a34a; font-weight:600; }
+  .fech-saldo-neg { color:#dc2626; font-weight:600; }
+  .fech-saldo-zero { color:var(--muted); }
+  .fech-vazia, .fech-carregando { text-align:center; padding:48px 20px !important; color:var(--muted-2); }
+  .fech-vazia i, .fech-carregando i { font-size:32px; display:block; margin-bottom:10px; color:var(--border-strong); }
+  .fech-linha-total td { font-weight:700; background:var(--surface-2); border-top:2px solid var(--border); }
+
+  @media (max-width:720px) {
+    .fech-resumo { grid-template-columns:1fr 1fr; }
+    .fech-kpi-acao { grid-column:1 / -1; justify-content:stretch; }
+    .fech-kpi-acao .btn-primary { width:100%; }
+  }
+</style>

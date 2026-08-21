@@ -1,0 +1,1112 @@
+/* =======================================================
+   CronaSys — style.css
+   Layout: Flexbox, Dark Sidebar + Light Content Area
+   Cores principais:
+     Sidebar bg  → #111827
+     Texto sidebar → #9ca3af
+     Destaque    → var(--brand)
+     Conteúdo bg → #f3f4f6
+======================================================= */
+
+:root {
+  --brand: #1e4e8c;
+  --brand-press: #173a68;
+
+  --surface: #ffffff;       /* fundo de cartões/painéis */
+  --surface-2: #f9fafb;     /* fundo sutil / hover */
+  --surface-3: #f3f4f6;     /* fundo mais sutil */
+  --border: #e5e7eb;        /* bordas */
+  --border-strong: #d1d5db; /* bordas mais marcadas */
+  --text: #111827;          /* texto forte */
+  --text-soft: #374151;     /* texto médio (labels) */
+  --muted: #6b7280;         /* texto secundário */
+  --muted-2: #9ca3af;       /* texto mais fraco */
+
+  /* Fundos de status (pastel no claro, escurecem no escuro) */
+  --tint-blue: #eff6ff;
+  --tint-blue-strong: #bfdbfe;
+  --tint-green: #f0fdf4;
+  --tint-red: #fef2f2;
+  --tint-amber: #fffbeb;
+  --tint-amber-strong: #fde68a;
+  --tint-orange: #fff7ed;
+  --tint-purple: #f5f3ff;
+
+  /* Textos de status escuros (clareiam no escuro) */
+  --fg-green: #15803d;
+  --fg-red: #b91c1c;
+  --fg-amber: #b45309;
+  --fg-blue: #1d4ed8;
+  --fg-purple: #7c3aed;
+}
+
+html[data-theme="dark"] {
+  --surface: #26282c;
+  --surface-2: #2f3136;
+  --surface-3: #1e1f22;
+  --border: #34363c;
+  --border-strong: #3a3c42;
+  --text: #f2f3f5;
+  --text-soft: #d4d6db;
+  --muted: #a6a9b0;
+  --muted-2: #8b8f97;
+
+  --tint-blue: #1b2536;
+  --tint-blue-strong: #243a5e;
+  --tint-green: #18271d;
+  --tint-red: #2b1a1c;
+  --tint-amber: #2a2410;
+  --tint-amber-strong: #3b3216;
+  --tint-orange: #2a1f14;
+  --tint-purple: #221f33;
+
+  --fg-green: #5fd39a;
+  --fg-red: #f08a8a;
+  --fg-amber: #e0a657;
+  --fg-blue: #7aa2f0;
+  --fg-purple: #b794f6;
+  --panel-glass: rgba(38,40,44,0.72);
+}
+
+/* Fonte do logo e dos títulos (personalidade do projeto) */
+.sidebar-logo,
+.topbar-title,
+.page-header h1,
+.login-brand h1,
+.error-state h3 {
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ── Reset básico ────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* ── Layout raiz: sidebar + wrapper lado a lado ────── */
+body {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* evita scroll lateral */
+}
+
+body.auth-locked .sidebar,
+body.auth-locked .main-wrapper {
+  display: none;
+}
+
+/* =======================================================
+   LOGIN  — tela dividida em tela cheia (padrão CronaSys)
+======================================================= */
+.login-shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  z-index: 1000;
+  background: var(--surface);
+}
+
+/* ---- Painel esquerdo: a marca (navy, quadrado) ---- */
+.login-aside {
+  position: relative;
+  flex: 0 0 32%;
+  max-width: 32%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 48px 40px;
+  color: #eaf1fb;
+  background: var(--brand);
+  overflow: hidden;
+}
+
+
+.login-wordmark {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+.login-wordmark strong { color: #bcd4f4; }
+.login-wordmark-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.login-logo {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 210px;
+  max-width: 62%;
+  height: auto;
+}
+
+.login-aside-lead {
+  position: relative;
+  z-index: 1;
+  margin-top: 18px;
+  max-width: 34ch;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(234, 241, 251, 0.82);
+}
+
+.login-features {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 16px;
+  margin-top: 38px;
+  max-width: 34ch;
+}
+
+
+.login-feature {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.login-feature > i {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: #bcd4f4;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.login-feature strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+.login-feature span {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(234, 241, 251, 0.70);
+}
+
+.login-aside-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+.login-restrito {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(234, 241, 251, 0.85);
+}
+.login-restrito i {
+  font-size: 11px;
+  color: #bcd4f4;
+}
+.login-rodape {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(234, 241, 251, 0.60);
+}
+
+/* ---- Painel direito: o formulário ---- */
+.login-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  background: var(--surface);
+  overflow-y: auto;
+}
+.login-box {
+  width: 100%;
+  max-width: 360px;
+}
+
+.login-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.login-heading {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+}
+.login-field {
+  display: grid;
+  gap: 6px;
+}
+.login-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+.login-field input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--border-strong);
+  border-radius: 0;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.login-field input::placeholder { color: var(--muted-2); }
+.login-field input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(30, 78, 140, 0.18);
+}
+
+.login-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.login-error {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 0;
+  border: 1px solid var(--tint-red);
+  background: var(--tint-red);
+  color: var(--fg-red);
+  font-size: 13px;
+}
+.login-error.visivel { display: flex; }
+
+.login-submit {
+  width: 100%;
+  height: 44px;
+  justify-content: center;
+  border-radius: 0;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.login-submit:disabled { opacity: 0.75; cursor: not-allowed; }
+
+.login-link {
+  display: inline-block;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.login-link:hover { text-decoration: underline; }
+
+/* Selo de segurança — reforça confiança sem ser alarmista */
+.login-security-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 28px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.login-security-badge i {
+  font-size: 11px;
+  color: #16a34a;
+}
+
+/* ---- Responsivo: empilha no celular ---- */
+@media (max-width: 820px) {
+  .login-shell { flex-direction: column; }
+  .login-aside {
+    flex: 0 0 auto;
+    max-width: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 26px;
+    background: var(--brand);
+  }
+  .login-aside-lead { display: none; }
+  .login-features { display: none; }
+  .login-aside-foot { flex-direction: row; align-items: center; gap: 12px; }
+  .login-logo { width: 148px; }
+  .login-rodape { display: none; }
+  .login-panel { padding: 34px 24px 44px; align-items: flex-start; }
+}
+
+/* =======================================================
+   SIDEBAR
+======================================================= */
+.sidebar {
+  width: 240px;
+  min-width: 240px;          /* não encolhe */
+  height: 100vh;
+  background: #e9ecf1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;           /* fica fixa ao rolar o conteúdo */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* ── Logotipo ──────────────────────────────────────── */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px 12px;
+  font-size: 18px;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.sidebar-logo i {
+  color: var(--brand);
+  font-size: 20px;
+}
+
+.sidebar-logo-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 0;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* Logotipo completo (sempre navy, n&atilde;o troca com o tema) */
+.sidebar-logo-full {
+  height: 32px;
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+}
+
+.sidebar-logo strong {
+  color: var(--brand);
+}
+
+/* ── Navegação ─────────────────────────────────────── */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0 16px;
+}
+
+/* Rótulo de seção (ex: "Principal", "Gestão") */
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #4b5563;
+  padding: 12px 20px 6px;
+}
+
+/* Divisões entre seções do menu */
+.nav-section + .nav-section {
+  margin-top: 8px;
+}
+.nav-section.oculta {
+  display: none;
+}
+
+.sidebar-nav ul {
+  margin-bottom: 8px;
+}
+
+/* Item de navegação */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  cursor: pointer;
+  position: relative;
+}
+
+.nav-item:hover {
+  background: #dde2e9;
+  color: #111827;
+}
+
+/* Estado ativo (página atual) */
+.nav-item.active {
+  background: #d3dae4;
+  color: #111827;
+  border-left-color: var(--brand);
+}
+
+.nav-item i {
+  width: 18px;              /* largura fixa → ícones alinhados */
+  text-align: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+/* Badge de notificação (ex: "3 mensagens") */
+.nav-badge {
+  margin-left: auto;
+  background: var(--brand);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 0;
+  line-height: 1.6;
+}
+
+/* ── Perfil (rodapé da sidebar) ─────────────────────── */
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid #dce0e7;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.sidebar-profile:hover {
+  background: #dde2e9;
+}
+
+/* Avatar circular com iniciais */
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.profile-info {
+  flex: 1;
+  overflow: hidden;         /* evita text overflow empurrar layout */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-role {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.profile-logout {
+  color: #6b7280;
+  font-size: 15px;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.profile-logout:hover {
+  color: #ef4444;
+}
+
+/* =======================================================
+   WRAPPER PRINCIPAL (topbar + conteúdo)
+======================================================= */
+.main-wrapper {
+  margin-left: 240px;       /* acompanha largura da sidebar */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Topbar ─────────────────────────────────────────── */
+.topbar {
+  height: 56px;
+  background: transparent;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .2px;
+}
+.topbar-title i {
+  font-size: 16px;
+  color: var(--brand);
+  width: 22px;
+  text-align: center;
+}
+
+.topbar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-date {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Avatar reduzido na topbar */
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform .15s, box-shadow .15s;
+}
+.topbar-avatar:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px rgba(127, 127, 127, 0.18);
+}
+
+/* Sino de avisos com bolinha de notificação */
+.topbar-bell {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 17px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+}
+.topbar-bell:hover {
+  background: rgba(127, 127, 127, 0.12);
+  color: var(--text);
+}
+.topbar-bell-dot {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  display: none;
+}
+
+/* =======================================================
+   ÁREA DE CONTEÚDO  (main#content)
+======================================================= */
+#content {
+  flex: 1;
+  overflow-y: auto;         /* scroll vertical apenas no conteúdo */
+  background: #f3f4f6;
+  padding: 28px;
+}
+
+/* =======================================================
+   ESTADO DE CARREGAMENTO INICIAL
+======================================================= */
+.loading-initial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 14px;
+  color: #9ca3af;
+}
+
+.loading-initial i {
+  font-size: 36px;
+  color: var(--brand);
+}
+
+.loading-initial p {
+  font-size: 14px;
+}
+
+/* =======================================================
+   ESTADO DE ERRO (usado pelo main.js)
+======================================================= */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.error-state i {
+  font-size: 40px;
+  color: #ef4444;
+}
+
+.error-state h3 {
+  font-size: 16px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.error-state p {
+  font-size: 13px;
+  color: #9ca3af;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* =======================================================
+   UTILITÁRIOS GLOBAIS (disponíveis para todas as páginas)
+======================================================= */
+
+/* Cabeçalho padrão de página interna */
+.page-header {
+  margin-bottom: 0;
+}
+/* Se o cabeçalho ainda tem controles (selects/botões) ou o período do dashboard,
+   mantém um respiro antes do conteúdo. Senão, cola tudo no topo. */
+.page-header:has(button),
+.page-header:has(select),
+.page-header:has(input),
+.page-header:has(.dash-periodo) {
+  margin-bottom: 20px;
+}
+
+/* O título foi pro topo (topbar). Os controles do cabeçalho, que ficavam à
+   direita ao lado do título, agora alinham à esquerda — sobem e preenchem o
+   espaço que ficou em branco. Cobre os dois formatos de cabeçalho:
+   flex no próprio .page-header (dashboard/ficha) e flex num <div> interno. */
+.page-header.dash-header,
+.page-header.fm-header {
+  justify-content: flex-start;
+}
+.page-header > div[style*="space-between"] {
+  justify-content: flex-start !important;
+}
+
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.3px;
+}
+
+.page-header p {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* O título da página fica só no topo (topbar), com o ícone.
+   Aqui escondemos o título E a descrição duplicados; o cabeçalho
+   mantém só os controles (selects, botões), se a página tiver. */
+.page-header h1,
+.page-header p {
+  display: none;
+}
+
+/* Card branco genérico */
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Grid de cards responsivo */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* Botão primário */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: var(--brand-press);
+}
+
+/* Botão secundário */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* Badge de status */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 0;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--surface-3);
+  color: var(--text-soft);
+}
+
+.badge-ativo    { background: var(--tint-green); color: var(--fg-green); }
+.badge-inativo  { background: var(--tint-red); color: var(--fg-red); }
+.badge-pendente { background: var(--tint-amber); color: var(--fg-amber); }
+.badge-adm      { background: var(--tint-purple); color: var(--fg-purple); }
+
+/* Seletor de tema + linha de aparência (Perfil) */
+.aparencia-linha { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.aparencia-titulo { display:block; font-size:14px; font-weight:600; color:#111827; }
+.aparencia-desc { font-size:13px; color:#6b7280; }
+.segmento { display:inline-flex; gap:3px; padding:3px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius: 0; }
+.segmento button { font:inherit; font-size:13px; font-weight:600; padding:6px 16px; border:none; border-radius: 0; background:transparent; color:#6b7280; cursor:pointer; transition:background .15s, color .15s; }
+.segmento button.active { background:var(--brand); color:#fff; }
+
+/* =======================================================
+   SCROLLBAR DISCRETA (Webkit)
+======================================================= */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ── Linha abonada na tabela de ponto (Gestão) ─────── */
+.linha-abonada {
+  background: var(--tint-blue);  /* azul muito claro */
+}
+/* =======================================================
+   RESPONSIVO / MOBILE
+   (a barra lateral vira menu retrátil; conteúdo ocupa a tela toda)
+======================================================= */
+.menu-toggle {
+  display: none;            /* escondido no desktop */
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #374151;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-right: 2px;
+}
+.sidebar-overlay {
+  display: none;            /* só aparece quando o menu abre no mobile */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 90;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);     /* fica escondida fora da tela */
+    transition: transform 0.25s ease;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.25);
+  }
+  .sidebar.aberta { transform: translateX(0); }   /* desliza para dentro */
+  .sidebar-overlay.ativa { display: block; }
+  .main-wrapper { margin-left: 0; }               /* conteúdo na largura toda */
+  .menu-toggle { display: inline-flex; align-items: center; }
+  .topbar { padding: 0 14px; }
+  .topbar-date { display: none; }                 /* economiza espaço */
+  #content { padding: 16px; }
+  /* tabelas largas rolam na horizontal em vez de estourar a tela */
+  #content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+  body { overflow-x: hidden; }
+}
+
+/* =======================================================
+   TEMA ESCURO
+   Cobre o esqueleto e os componentes globais. As telas com
+   <style> próprio são escurecidas em lotes (próximo passo).
+======================================================= */
+html[data-theme="dark"] body { background:#1e1f22; color:#e9eaee; }
+html[data-theme="dark"] #content { background:#1e1f22; }
+
+/* Sidebar (já era escura — só alinho o tom) */
+html[data-theme="dark"] .sidebar { background:#17181b; }
+html[data-theme="dark"] .sidebar-logo { color:#f9fafb; }
+html[data-theme="dark"] .nav-item { color:#9ca3af; }
+html[data-theme="dark"] .nav-item:hover { background:#26282c; color:#f9fafb; }
+html[data-theme="dark"] .nav-item.active { background:#2a3550; color:#ffffff; }
+html[data-theme="dark"] .sidebar-profile { border-top-color:#2a2c31; }
+html[data-theme="dark"] .sidebar-profile:hover { background:#26282c; }
+html[data-theme="dark"] .profile-name { color:#f9fafb; }
+
+/* Topbar */
+html[data-theme="dark"] .topbar { background:transparent; border-bottom-color:transparent; }
+html[data-theme="dark"] .topbar-title { color:#f2f3f5; }
+html[data-theme="dark"] .topbar-date { color:#a6a9b0; }
+html[data-theme="dark"] .menu-toggle { color:#c9ccd2; }
+
+/* Cabeçalho de página + estados */
+html[data-theme="dark"] .page-header h1,
+html[data-theme="dark"] .error-state h3 { color:#f2f3f5; }
+html[data-theme="dark"] .page-header p,
+html[data-theme="dark"] .error-state p,
+html[data-theme="dark"] .loading-initial { color:#a6a9b0; }
+
+/* Cartões */
+html[data-theme="dark"] .card { background:#26282c; border-color:#34363c; box-shadow:none; }
+
+/* Botões secundários */
+html[data-theme="dark"] .btn-secondary { background:#2f3136; color:#e9eaee; border-color:#3a3c42; }
+html[data-theme="dark"] .btn-secondary:hover { background:#34363c; border-color:#4a4d55; }
+
+/* Formulários */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .form-input { background:#1e1f22; color:#f2f3f5; border-color:#3a3c42; }
+html[data-theme="dark"] input::placeholder { color:#6f727a; }
+
+/* Tabelas dentro do conteúdo */
+html[data-theme="dark"] #content table { color:#e9eaee; }
+html[data-theme="dark"] #content th,
+html[data-theme="dark"] #content td { border-color:#34363c; }
+
+/* Seletor de tema */
+html[data-theme="dark"] .segmento { background:#1e1f22; border-color:#34363c; }
+html[data-theme="dark"] .aparencia-titulo { color:#f2f3f5; }
+html[data-theme="dark"] .aparencia-desc { color:#a6a9b0; }
+
+/* Perfil (ajustes pra não vazar claro nesta tela) */
+html[data-theme="dark"] .perfil-topo,
+html[data-theme="dark"] .perfil-section-label { border-color:#34363c; }
+html[data-theme="dark"] .perfil-chip strong { color:#f2f3f5; }
+html[data-theme="dark"] .perfil-chip small,
+html[data-theme="dark"] .perfil-group label { color:#a6a9b0; }
+
+/* Linha abonada (Gestão) */
+html[data-theme="dark"] .linha-abonada { background:#1d2735; }
+
+/* Scrollbar */
+html[data-theme="dark"] ::-webkit-scrollbar-thumb { background:#3a3c42; }
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background:#4a4d55; }
+/* =======================================================
+   Modais de confirmação (cronaConfirm / cronaConfirmSenha)
+======================================================= */
+.cconf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  animation: cconf-fade 0.12s ease-out;
+}
+@keyframes cconf-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.cconf-box {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.45);
+  padding: 22px 22px 18px;
+}
+.cconf-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cconf-title i { color: var(--brand); font-size: 14px; }
+.cconf-msg {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+.cconf-senha {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--border-strong);
+  border-radius: 0;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  margin-bottom: 8px;
+}
+.cconf-senha:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(30, 78, 140, 0.18);
+}
+.cconf-erro {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--fg-red, #b91c1c);
+}
+.cconf-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+.cconf-btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 0;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-soft);
+}
+.cconf-btn:hover { background: var(--surface-2, rgba(127,127,127,0.08)); }
+.cconf-ok {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+.cconf-ok:hover { background: var(--brand-press, #173a68); }
+.cconf-ok.cconf-perigo {
+  border-color: #b91c1c;
+  background: #b91c1c;
+}
+.cconf-ok.cconf-perigo:hover { background: #991b1b; }
+.cconf-btn:disabled { opacity: 0.7; cursor: not-allowed; }

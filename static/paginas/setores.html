@@ -1,0 +1,149 @@
+<!-- ================================================
+     paginas/setores.html
+     Injetado em <main id="content"> pelo main.js.
+     O main.js chama iniciarModuloSetores() após injetar.
+================================================ -->
+
+<div class="page-header">
+  <div>
+    <h1>Setores</h1>
+    <p>Crie, renomeie e inative setores · tabela <code>setores</code></p>
+  </div>
+</div>
+
+<!-- ── ADICIONAR / EDITAR SETOR ───────────────── -->
+<div class="card" id="setCardAdd" style="margin-bottom:20px;">
+  <div class="set-section-label" id="setFormTitulo">Adicionar setor</div>
+  <div class="set-add-grid">
+    <div class="set-group">
+      <label class="set-label">Nome do setor</label>
+      <input type="text" id="setNome" class="form-input" maxlength="50"
+             placeholder="Ex: Recursos Humanos" autocomplete="off" />
+    </div>
+    <div class="set-group set-add-btn">
+      <button class="btn-primary" id="btnAddSetor">
+        <i class="fa-solid fa-plus"></i> <span id="btnAddSetorLabel">Adicionar</span>
+      </button>
+      <button class="btn-secundario" id="btnCancelarSetor" style="display:none;">Cancelar</button>
+    </div>
+  </div>
+  <div id="setErro" class="set-erro" style="display:none;">
+    <i class="fa-solid fa-circle-exclamation"></i> <span id="setErroMsg"></span>
+  </div>
+</div>
+
+<!-- ── LISTA DE SETORES ───────────────────────── -->
+<div class="card">
+  <div class="set-toolbar">
+    <strong>Setores cadastrados</strong>
+    <span id="setTotal" style="font-size:13px;color:var(--muted-2);">– setores</span>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table id="tabelaSetores">
+      <thead>
+        <tr>
+          <th>Setor</th>
+          <th style="text-align:center;">Funcionários</th>
+          <th style="text-align:center;">Status</th>
+          <th style="text-align:center;">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="corpoSetores">
+        <tr>
+          <td colspan="4" class="set-carregando">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Carregando...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── ESTILOS LOCAIS ─────────────────────────── -->
+<style>
+  .set-section-label {
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--brand); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);
+  }
+  .set-add-grid { display:grid; grid-template-columns:1fr auto; gap:14px; align-items:end; }
+  .set-group { display:flex; flex-direction:column; }
+  .set-label { font-size:13px; font-weight:500; color:var(--text-soft); margin-bottom:6px; }
+  .set-add-btn { flex-direction:row; align-items:center; gap:8px; }
+  .set-add-btn .btn-primary { height:42px; }
+  .btn-secundario {
+    height:42px; padding:0 16px; border:1px solid var(--border); border-radius: 0;
+    background:var(--surface); color:var(--text-soft); cursor:pointer; font-size:14px;
+  }
+  .btn-secundario:hover { background:var(--surface-2); }
+  .set-erro {
+    display:flex; align-items:center; gap:8px;
+    background:var(--tint-red); border:1px solid var(--tint-red); border-radius: 0;
+    padding:10px 14px; color:var(--fg-red); font-size:13px; margin-top:14px;
+  }
+
+  .set-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+
+  #tabelaSetores { width:100%; border-collapse:collapse; font-size:14px; }
+  #tabelaSetores thead th {
+    padding:10px 14px; font-size:11px; font-weight:700; text-align:left;
+    text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+    border-bottom:2px solid var(--surface-3); background:var(--surface-2); white-space:nowrap;
+  }
+  #tabelaSetores tbody tr { border-bottom:1px solid var(--surface-3); transition:background .1s; }
+  #tabelaSetores tbody tr:hover { background:var(--surface-2); }
+  #tabelaSetores tbody tr:last-child { border-bottom:none; }
+  #tabelaSetores tbody td { padding:13px 14px; color:var(--text-soft); vertical-align:middle; }
+  .set-carregando, .set-vazia { text-align:center; padding:48px 20px !important; color:var(--muted-2); }
+  .set-vazia i { font-size:32px; display:block; margin-bottom:10px; color:var(--border-strong); }
+
+  .set-inativo td { opacity:.55; }
+  .set-badge {
+    display:inline-block; padding:3px 12px; border-radius: 0; font-size:12px; font-weight:600;
+  }
+  .set-badge.ativo   { background:var(--tint-green); color:#166534; }
+  .set-badge.inativo { background:var(--surface-3); color:var(--muted); }
+  .set-qtd { display:inline-block; min-width:26px; padding:2px 8px; border-radius: 0;
+             background:var(--surface-3); color:var(--text-soft); font-size:12px; font-weight:600; }
+
+  .set-acoes { display:flex; gap:6px; justify-content:center; }
+  .set-acoes button {
+    height:32px; padding:0 10px; border:1px solid var(--border); border-radius: 0;
+    background:var(--surface); cursor:pointer; font-size:13px; color:var(--muted);
+    display:inline-flex; align-items:center; gap:6px; transition:all .15s;
+  }
+  .set-acoes button:hover { background:var(--surface-2); color:var(--text); }
+  .set-acoes .acao-inativar:hover { background:var(--tint-red); border-color:#ef4444; color:#ef4444; }
+  .set-acoes .acao-reativar:hover { background:var(--tint-green); border-color:#22c55e; color:#166534; }
+
+  /* ── Painel que expande (funcionários do setor) ─── */
+  .set-row { cursor:pointer; }
+  .set-chevron { color:var(--muted-2); font-size:12px; margin-right:8px; transition:transform .15s; }
+  .set-chevron.aberto { transform:rotate(90deg); }
+  .set-detalhe-row td { padding:0 !important; background:var(--surface-2); }
+  .set-detalhe { padding:14px 18px 16px 38px; }
+  .set-detalhe-load, .set-detalhe-vazio { color:var(--muted-2); font-size:13px; padding:6px 0; }
+  .set-detalhe-titulo {
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+    color:var(--muted); margin-bottom:10px;
+  }
+  .set-func-lista { display:flex; flex-direction:column; gap:6px; }
+  .set-func-item {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:8px 12px; border-radius: 0; background:var(--surface); border:1px solid var(--surface-3);
+  }
+  .set-func-item.inativo { opacity:.55; }
+  .set-func-nome { font-size:14px; color:var(--text); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .set-func-nome i { color:var(--muted-2); font-size:12px; }
+  .set-func-nome small { color:var(--muted-2); font-size:12px; }
+  .set-tag-inativo { background:var(--surface-3); color:var(--muted); padding:1px 7px; border-radius: 0; font-size:11px; }
+  .set-func-cargo {
+    font-size:13px; color:var(--text-soft); font-weight:500; white-space:nowrap;
+    background:var(--surface-3); padding:3px 12px; border-radius: 0;
+  }
+  .set-func-cargo em { color:var(--muted-2); font-weight:400; }
+
+  @media (max-width:640px) {
+    .set-add-grid { grid-template-columns:1fr; }
+  }
+</style>

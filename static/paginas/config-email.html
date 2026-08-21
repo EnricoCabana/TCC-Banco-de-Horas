@@ -1,0 +1,106 @@
+<!-- ================================================
+     paginas/config-email.html
+     Tela de Configuração de E-mail (SMTP) — somente admin.
+     main.js chama iniciarModuloConfigEmail() após injetar.
+================================================ -->
+
+<div class="page-header">
+  <div>
+    <h1>Configuração de E-mail</h1>
+    <p>Parâmetros de SMTP usados pelo sistema para enviar e-mails</p>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:20px;">
+  <div class="cfg-section-label">Servidor de envio (SMTP)</div>
+
+  <div class="cfg-grid">
+    <div class="cfg-group cfg-col-2">
+      <label>Servidor (host)</label>
+      <input type="text" id="cfgHost" class="form-input" placeholder="ex.: mail.ifinformatica.com" autocomplete="off" />
+    </div>
+    <div class="cfg-group">
+      <label>Porta</label>
+      <input type="number" id="cfgPorta" class="form-input" placeholder="465 ou 587" />
+    </div>
+    <div class="cfg-group">
+      <label>Segurança</label>
+      <select id="cfgSeguranca" class="form-input">
+        <option value="SSL">SSL (porta 465)</option>
+        <option value="STARTTLS">STARTTLS (porta 587)</option>
+        <option value="NENHUMA">Nenhuma</option>
+      </select>
+    </div>
+    <div class="cfg-group cfg-col-2">
+      <label>Usuário (e-mail da conta)</label>
+      <input type="text" id="cfgUsuario" class="form-input" placeholder="ex.: cronasys@ifinformatica.com" autocomplete="off" />
+    </div>
+    <div class="cfg-group cfg-col-2">
+      <label>Senha <small id="cfgSenhaHint" style="font-weight:400;color:var(--muted-2);"></small></label>
+      <input type="password" id="cfgSenha" class="form-input" autocomplete="new-password" placeholder="senha da conta (ou senha de app)" />
+    </div>
+  </div>
+
+  <div class="cfg-section-label" style="margin-top:8px;">Remetente</div>
+  <div class="cfg-grid">
+    <div class="cfg-group cfg-col-2">
+      <label>Nome do remetente</label>
+      <input type="text" id="cfgRemetenteNome" class="form-input" placeholder="ex.: RH — IF Informática" autocomplete="off" />
+    </div>
+    <div class="cfg-group cfg-col-2">
+      <label>E-mail do remetente</label>
+      <input type="text" id="cfgRemetenteEmail" class="form-input" placeholder="normalmente igual ao usuário acima" autocomplete="off" />
+    </div>
+  </div>
+
+  <label class="cfg-check">
+    <input type="checkbox" id="cfgAtivo" />
+    <span>Ativar o envio de e-mail pelo sistema</span>
+  </label>
+
+  <div id="cfgErro" class="cfg-erro" style="display:none;">
+    <i class="fa-solid fa-circle-exclamation"></i> <span id="cfgErroMsg"></span>
+  </div>
+
+  <div class="cfg-acoes">
+    <button class="btn-primary" id="btnCfgSalvar"><i class="fa-solid fa-floppy-disk"></i> Salvar configuração</button>
+  </div>
+
+  <div class="cfg-ajuda">
+    <strong>Dicas:</strong>
+    <ul>
+      <li><b>Hospedagem própria</b> (caso da IF): host como <code>mail.ifinformatica.com</code>, porta <code>465</code> com <b>SSL</b>, usuário = o e-mail completo da conta.</li>
+      <li><b>Gmail / Google Workspace</b>: host <code>smtp.gmail.com</code>, porta <code>587</code> com <b>STARTTLS</b>, e uma <b>senha de app</b> (precisa de verificação em 2 etapas).</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Teste de envio -->
+<div class="card">
+  <div class="cfg-section-label">Enviar e-mail de teste</div>
+  <p style="color:var(--muted);font-size:13px;margin:-6px 0 14px;">Salve a configuração antes de testar. O e-mail vai com a config já salva.</p>
+  <div class="cfg-teste">
+    <input type="email" id="cfgTesteDestino" class="form-input" placeholder="enviar teste para... (e-mail)" autocomplete="off" />
+    <button class="btn-secondary" id="btnCfgTestar"><i class="fa-solid fa-paper-plane"></i> Enviar teste</button>
+  </div>
+</div>
+
+<style>
+  .cfg-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--brand); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .cfg-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:18px; }
+  .cfg-group { display:flex; flex-direction:column; }
+  .cfg-col-2 { grid-column:span 2; }
+  .cfg-group label { font-size:13px; font-weight:500; color:var(--text-soft); margin-bottom:6px; }
+  .cfg-check { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--text-soft); margin-bottom:18px; cursor:pointer; }
+  .cfg-check input { width:16px; height:16px; }
+  .cfg-erro { display:flex; align-items:center; gap:8px; background:var(--tint-red); border:1px solid var(--tint-red); color:var(--fg-red); border-radius: 0; padding:10px 14px; font-size:13px; margin-bottom:16px; }
+  .cfg-acoes { display:flex; justify-content:flex-end; margin-bottom:8px; }
+  .cfg-ajuda { background:var(--surface-2); border:1px solid var(--border); border-radius: 0; padding:12px 16px; font-size:13px; color:var(--text-soft); margin-top:14px; }
+  .cfg-ajuda ul { margin:8px 0 0; padding-left:18px; }
+  .cfg-ajuda li { margin-bottom:6px; }
+  .cfg-ajuda code { background:var(--tint-blue); color:var(--fg-blue); padding:1px 6px; border-radius: 0; font-size:12px; }
+  .cfg-teste { display:flex; gap:10px; flex-wrap:wrap; }
+  .cfg-teste .form-input { flex:1; min-width:220px; }
+
+  @media (max-width:560px) { .cfg-grid { grid-template-columns:1fr; } .cfg-col-2 { grid-column:span 1; } }
+</style>

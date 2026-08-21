@@ -1,0 +1,73 @@
+<!-- ================================================
+     paginas/backup.html
+     Tela de Backup do banco de dados — somente admin.
+     main.js chama iniciarModuloBackup() após injetar.
+================================================ -->
+
+<div class="page-header">
+  <div>
+    <h1>Backup</h1>
+    <p>Cópia de segurança do banco de dados</p>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:20px;">
+  <div class="bkp-section-label">Gerar backup agora</div>
+  <p class="bkp-intro">
+    Gera uma cópia completa do banco de dados (funcionários, registros de ponto,
+    avisos, setores — tudo) em um arquivo <code>.sql</code>. Você pode baixar o
+    arquivo na hora e/ou enviá-lo por e-mail, para manter uma cópia guardada
+    <b>fora do servidor</b>.
+  </p>
+
+  <div class="bkp-acoes">
+    <button class="btn-primary" id="btnBkpBaixar">
+      <i class="fa-solid fa-download"></i> Baixar backup
+    </button>
+    <button class="btn-secondary" id="btnBkpImportar">
+      <i class="fa-solid fa-upload"></i> Restaurar backup
+    </button>
+    <input type="file" id="bkpArquivo" accept=".zip,.sql" style="display:none;" />
+  </div>
+
+  <div id="bkpStatus" class="bkp-status" style="display:none;"></div>
+</div>
+
+<div class="card">
+  <div class="bkp-section-label">Como funciona</div>
+  <ul class="bkp-ajuda">
+    <li><b>Baixar backup</b> gera um <code>.zip</code> com dois arquivos: o dump do banco (<code>.sql</code>)
+        e a assinatura de integridade (<code>integridade.sha256</code>), e faz o download no seu navegador.</li>
+    <li><b>Verificação de integridade:</b> ao restaurar um <code>.zip</code>, o sistema recalcula o hash
+        SHA-256 do dump e compara com a assinatura. Se o arquivo tiver sido alterado ou corrompido,
+        a restauração é <b>recusada</b> e o banco não é tocado.</li>
+    <li><b>Restaurar backup</b> sobe o <b>.zip</b> (ou um <b>.sql</b> solto, de backups antigos) e recarrega o banco com os dados dele. <b style="color:#dc2626;">Atenção:</b> substitui os dados atuais — use com cuidado.</li>
+    <li><b>Restaurar:</b> o passo a passo para recuperar o banco a partir de um arquivo de backup está em <code>docs/backup_restauracao.md</code>.</li>
+  </ul>
+</div>
+
+<!-- Modal: confirmação por senha (ação sensível) -->
+<style>
+  .bkp-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--brand); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .bkp-intro { color:var(--text-soft); font-size:14px; line-height:1.6; margin:0 0 18px; }
+  .bkp-acoes { display:flex; gap:10px; flex-wrap:wrap; }
+  .bkp-status { margin-top:16px; display:flex; align-items:center; gap:8px; border-radius: 0; padding:10px 14px; font-size:13px; }
+  .bkp-status.ok         { background:var(--tint-green); border:1px solid var(--tint-green); color:#166534; }
+  .bkp-status.erro       { background:var(--tint-red); border:1px solid var(--tint-red); color:var(--fg-red); }
+  .bkp-status.carregando { background:var(--surface-2); border:1px solid var(--border); color:var(--text-soft); }
+  .bkp-ajuda { margin:0; padding-left:18px; color:var(--text-soft); font-size:13px; }
+  .bkp-ajuda li { margin-bottom:8px; line-height:1.5; }
+  .bkp-ajuda code, .bkp-intro code { background:var(--tint-blue); color:var(--fg-blue); padding:1px 6px; border-radius: 0; font-size:12px; }
+
+  /* e-mails de destino */
+  .bkp-input { padding:8px 12px; border:1px solid var(--border); border-radius: 0; background:var(--surface-2); color:var(--text); font-size:13px; font-family:inherit; }
+  .bkp-emails-lista { display:flex; flex-direction:column; gap:8px; }
+  .bkp-email-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px; border:1px solid var(--border); border-radius: 0; background:var(--surface-2); }
+  .bkp-email-addr { font-size:13px; color:var(--text); display:flex; align-items:center; gap:8px; word-break:break-all; }
+  .bkp-email-addr i { color:var(--muted-2); }
+  .bkp-icon-btn { border:1px solid var(--border); background:var(--surface); color:var(--text-soft); width:30px; height:30px; border-radius: 0; cursor:pointer; }
+  .bkp-icon-btn:hover { background:var(--surface-3); }
+  .bkp-icon-btn.bkp-del:hover { border-color:var(--tint-red); color:var(--fg-red); }
+
+  /* modal de senha */
+</style>

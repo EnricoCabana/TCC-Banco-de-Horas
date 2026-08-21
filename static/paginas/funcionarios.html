@@ -1,0 +1,706 @@
+<!-- ================================================
+     paginas/funcionarios.html
+     Injetado em <main id="content"> pelo main.js.
+     JS carregado no index.html → sem <script src> aqui.
+================================================ -->
+
+<!-- Cabeçalho -->
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1>Funcionários</h1>
+      <p>Gestão de colaboradores · tabelas <code>usuarios</code>, <code>documentos</code>, <code>enderecos</code></p>
+    </div>
+    <button class="btn-primary" id="btnAbrirFormulario">
+      <i class="fa-solid fa-user-plus"></i> Novo Funcionário
+    </button>
+  </div>
+</div>
+
+<!-- ── FORMULÁRIO DE CADASTRO (recolhível) ─────── -->
+<div class="card" id="cardFormulario" style="display:none; margin-bottom:20px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <h2 class="func-form-titulo" id="tituloFormulario">
+      <i class="fa-solid fa-user-plus" style="color:var(--brand);margin-right:8px;"></i>
+      Novo Funcionário
+    </h2>
+    <button class="btn-secondary" id="btnCancelar" style="padding:6px 14px;font-size:13px;">
+      <i class="fa-solid fa-xmark"></i> Cancelar
+    </button>
+  </div>
+
+  <!-- Abas do formulário -->
+  <div class="func-tabs" id="formTabs">
+    <button class="func-tab active" data-tab="tab-principal">
+      <i class="fa-solid fa-user"></i> Dados Principais
+    </button>
+    <button class="func-tab" data-tab="tab-documentos">
+      <i class="fa-solid fa-id-card"></i> Documentos
+    </button>
+    <button class="func-tab" data-tab="tab-endereco">
+      <i class="fa-solid fa-location-dot"></i> Endereço
+    </button>
+    <button class="func-tab" data-tab="tab-emergencia">
+      <i class="fa-solid fa-phone"></i> Emergência
+    </button>
+  </div>
+
+  <!-- Tab 1: Dados Principais -->
+  <div class="func-tab-panel active" id="tab-principal">
+    <div class="func-section-label">Informações Pessoais</div>
+    <div class="func-grid">
+      <div class="func-group func-span-2">
+        <label class="func-label">Nome Completo <span class="func-req">*</span></label>
+        <input type="text" id="fNome" class="form-input" placeholder="Ex: Diego da Silva" autocomplete="off" />
+        <span class="func-error" id="err-fNome"></span>
+      </div>
+      <div class="func-group">
+        <label class="func-label">Cargo</label>
+        <input type="text" id="fCargo" class="form-input" placeholder="Ex: Técnico de Redes" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Data de Aniversário</label>
+        <input type="date" id="fAniversario" class="form-input" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Celular</label>
+        <input type="tel" id="fCelular" class="form-input" placeholder="(11) 9 0000-0000"
+               maxlength="16" oninput="funcMascaraCelular(this)" />
+        <span class="func-error" id="err-fCelular"></span>
+      </div>
+    </div>
+
+    <div class="func-section-label" style="margin-top:20px;">Acesso ao Sistema</div>
+    <div class="func-grid">
+      <div class="func-group">
+        <label class="func-label">Matrícula <span class="func-req">*</span></label>
+        <input type="text" id="fMatricula" class="form-input" placeholder="MAT-001" autocomplete="off" />
+        <span class="func-error" id="err-fMatricula"></span>
+      </div>
+      <div class="func-group">
+        <label class="func-label">E-mail <span class="func-req">*</span></label>
+        <input type="email" id="fEmail" class="form-input" placeholder="colaborador@empresa.com" />
+        <span class="func-error" id="err-fEmail"></span>
+      </div>
+      <div class="func-group">
+        <label class="func-label">Senha <span class="func-req">*</span> <span id="fSenhaDica" style="font-size:11px;color:var(--muted-2);font-weight:400;"></span></label>
+        <input type="password" id="fSenha" class="form-input" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+        <span class="func-error" id="err-fSenha"></span>
+      </div>
+      <div class="func-group">
+        <label class="func-label">Setor <span class="func-req">*</span></label>
+        <select id="fSetor" class="form-input">
+          <option value="">— Selecione —</option>
+        </select>
+        <span class="func-error" id="err-fSetor"></span>
+      </div>
+      <div class="func-group">
+        <label class="func-label">Tipo de Acesso</label>
+        <select id="fTipoAcesso" class="form-input">
+          <option value="PADRAO">Padrão (Funcionário)</option>
+          <option value="ADM">Administrador (RH)</option>
+        </select>
+      </div>
+      <div class="func-group">
+        <label class="func-label">Status da Conta</label>
+        <select id="fStatus" class="form-input">
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
+      </div>
+      <div class="func-group">
+        <label class="func-label">Ponto</label>
+        <select id="fIsento" class="form-input">
+          <option value="0">Participa do ponto</option>
+          <option value="1">Isento de ponto</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="func-section-label" style="margin-top:20px;">Jornada de Trabalho (escala semanal)</div>
+    <p style="font-size:12px;color:var(--muted-2);margin:-6px 0 12px;">Defina a meta de cada dia. <strong>00:00 = folga</strong>. Ex.: 08:00 = 8h · 04:00 = 4h.</p>
+    <div class="escala-grid">
+      <div class="escala-dia"><label>Dom</label><input type="time" id="fMetaDom" class="form-input" value="00:00" /></div>
+      <div class="escala-dia"><label>Seg</label><input type="time" id="fMetaSeg" class="form-input" value="08:00" /></div>
+      <div class="escala-dia"><label>Ter</label><input type="time" id="fMetaTer" class="form-input" value="08:00" /></div>
+      <div class="escala-dia"><label>Qua</label><input type="time" id="fMetaQua" class="form-input" value="08:00" /></div>
+      <div class="escala-dia"><label>Qui</label><input type="time" id="fMetaQui" class="form-input" value="08:00" /></div>
+      <div class="escala-dia"><label>Sex</label><input type="time" id="fMetaSex" class="form-input" value="08:00" /></div>
+      <div class="escala-dia"><label>Sáb</label><input type="time" id="fMetaSab" class="form-input" value="00:00" /></div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Documentos -->
+  <div class="func-tab-panel" id="tab-documentos">
+    <div class="func-section-label">Documentação</div>
+    <div class="func-grid">
+      <div class="func-group">
+        <label class="func-label">CPF <span class="func-req">*</span></label>
+        <input type="text" id="fCpf" class="form-input" placeholder="000.000.000-00"
+               maxlength="14" oninput="funcMascaraCpf(this)" />
+        <span class="func-error" id="err-fCpf"></span>
+      </div>
+      <div class="func-group">
+        <label class="func-label">RG</label>
+        <input type="text" id="fRg" class="form-input" placeholder="00.000.000-0"
+               maxlength="12" oninput="funcMascaraRg(this)" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Cartão SUS</label>
+        <input type="text" id="fCartaoSus" class="form-input" placeholder="000 0000 0000 0000"
+               maxlength="19" oninput="funcMascaraSus(this)" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Carteira de Trabalho</label>
+        <input type="text" id="fCarteiraTrab" class="form-input" placeholder="Nº da CTPS" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Endereço -->
+  <div class="func-tab-panel" id="tab-endereco">
+    <div class="func-section-label">Endereço Residencial</div>
+    <div class="func-grid">
+      <div class="func-group">
+        <label class="func-label">CEP</label>
+        <input type="text" id="fCep" class="form-input" placeholder="00000-000"
+               maxlength="9" oninput="funcMascaraCep(this)"
+               onblur="funcBuscarCep(this.value)" />
+        <small style="color:var(--muted-2);font-size:11px;">Preencha o CEP para autocompletar</small>
+      </div>
+      <div class="func-group func-span-2">
+        <label class="func-label">Rua / Logradouro</label>
+        <input type="text" id="fRua" class="form-input" placeholder="Av. Paulista" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Número</label>
+        <input type="text" id="fNum" class="form-input" placeholder="100" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Bairro</label>
+        <input type="text" id="fBairro" class="form-input" placeholder="Centro" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Cidade</label>
+        <input type="text" id="fCidade" class="form-input" placeholder="São Paulo" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: Contato de Emergência -->
+  <div class="func-tab-panel" id="tab-emergencia">
+    <div class="func-section-label">Contato de Emergência</div>
+    <div class="func-grid">
+      <div class="func-group func-span-2">
+        <label class="func-label">Nome do Contato</label>
+        <input type="text" id="fContatoNome" class="form-input" placeholder="Ex: Maria da Silva (Cônjuge)" />
+      </div>
+      <div class="func-group">
+        <label class="func-label">Telefone do Contato</label>
+        <input type="tel" id="fContatoTel" class="form-input" placeholder="(11) 9 0000-0000" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Erro global e ações -->
+  <div id="formErro" class="func-form-erro" style="display:none;">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span id="formErroMsg"></span>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--surface-3);">
+    <span style="font-size:12px;color:var(--muted-2);"><span class="func-req">*</span> Campos obrigatórios</span>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-secondary" onclick="funcLimparForm()">
+        <i class="fa-solid fa-rotate-left"></i> Limpar
+      </button>
+      <button class="btn-primary" id="btnSalvar">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span id="btnSalvarLabel">Cadastrar Funcionário</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TABELA DE LISTAGEM ──────────────────────── -->
+<div class="card">
+  <div class="card-toolbar">
+    <div class="func-search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="campoBusca" class="form-input"
+             placeholder="Filtrar por nome ou matrícula..."
+             oninput="filtrarTabela(this.value)" />
+    </div>
+    <span id="totalRegistros" style="font-size:13px;color:var(--muted-2);white-space:nowrap;">– registros</span>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table id="tabelaFuncionarios">
+      <thead>
+        <tr>
+          <th>Matrícula</th>
+          <th>Nome</th>
+          <th>Setor</th>
+          <th>Jornada</th>
+          <th>Acesso</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabela">
+        <tr>
+          <td colspan="7" class="tabela-carregando">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Carregando...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── MODAL DE EDIÇÃO COMPLETO ─────────────────── -->
+<div class="func-modal-overlay" id="funcModalOverlay">
+  <div class="func-modal">
+
+    <!-- Header do modal -->
+    <div class="func-modal-header">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="func-modal-avatar" id="funcModalAvatar">??</div>
+        <div>
+          <div class="func-modal-nome" id="funcModalNome">—</div>
+          <div class="func-modal-sub"  id="funcModalSub">—</div>
+        </div>
+      </div>
+      <button class="func-modal-fechar" id="funcModalFechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Abas do modal -->
+    <div class="func-tabs func-modal-tabs" id="modalTabs">
+      <button class="func-tab active" data-tab="mtab-principal">
+        <i class="fa-solid fa-user"></i> Dados Principais
+      </button>
+      <button class="func-tab" data-tab="mtab-documentos">
+        <i class="fa-solid fa-id-card"></i> Documentos
+      </button>
+      <button class="func-tab" data-tab="mtab-endereco">
+        <i class="fa-solid fa-location-dot"></i> Endereço
+      </button>
+      <button class="func-tab" data-tab="mtab-emergencia">
+        <i class="fa-solid fa-phone"></i> Emergência
+      </button>
+      <button class="func-tab" data-tab="mtab-ferias">
+        <i class="fa-solid fa-umbrella-beach"></i> Férias
+      </button>
+    </div>
+
+    <div class="func-modal-body">
+      <input type="hidden" id="editId" />
+
+      <!-- Tab 1: Dados Principais -->
+      <div class="func-tab-panel active" id="mtab-principal">
+        <div class="func-section-label">Informações Pessoais</div>
+        <div class="func-grid">
+          <div class="func-group func-span-2">
+            <label class="func-label">Nome Completo</label>
+            <input type="text" id="eNome" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Cargo</label>
+            <input type="text" id="eCargo" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Data de Aniversário</label>
+            <input type="date" id="eAniversario" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Celular</label>
+            <input type="tel" id="eCelular" class="form-input"
+                   maxlength="16" oninput="funcMascaraCelular(this)" />
+            <span class="func-error" id="err-eCelular"></span>
+          </div>
+        </div>
+
+        <div class="func-section-label" style="margin-top:20px;">Acesso ao Sistema</div>
+        <div class="func-grid">
+          <div class="func-group">
+            <label class="func-label">Matrícula</label>
+            <input type="text" id="eMatricula" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">E-mail</label>
+            <input type="email" id="eEmail" class="form-input" />
+          </div>
+          <div class="func-group" id="eSenhaGrupo">
+            <label class="func-label">Nova Senha <small style="color:var(--muted-2);font-weight:400;">(vazio = não altera)</small></label>
+            <input type="password" id="eSenha" class="form-input" placeholder="Deixe vazio para manter" autocomplete="new-password" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Setor</label>
+            <select id="eSetor" class="form-input">
+              <option value="">— Selecione —</option>
+            </select>
+          </div>
+          <div class="func-group">
+            <label class="func-label">Tipo de Acesso</label>
+            <select id="eTipoAcesso" class="form-input">
+              <option value="PADRAO">Padrão</option>
+              <option value="ADM">Administrador</option>
+            </select>
+          </div>
+          <div class="func-group">
+            <label class="func-label">Status</label>
+            <select id="eStatus" class="form-input">
+              <option value="ativo">Ativo</option>
+              <option value="inativo">Inativo</option>
+            </select>
+          </div>
+          <div class="func-group">
+            <label class="func-label">Controle de ponto</label>
+            <input type="hidden" id="eIsentoAtual" value="0" />
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span id="eIsentoBadge" class="badge badge-ativo">Participa do ponto</span>
+              <button type="button" id="btnAlterarIsento" onclick="_funcAbrirConfirmIsento()"
+                      style="padding:6px 12px;border:1px solid var(--border-strong);border-radius: 0;background:var(--surface-3);color:var(--text);cursor:pointer;font-size:13px;font-weight:600;">
+                Alterar
+              </button>
+            </div>
+            <small style="display:block;font-size:11px;color:var(--muted-2);margin-top:6px;">
+              "Isento" = não bate ponto (ex.: dono/diretoria). Pede sua senha para alterar.
+            </small>
+          </div>
+        </div>
+
+        <div class="func-section-label" style="margin-top:20px;">Jornada (escala semanal)</div>
+        <p style="font-size:12px;color:var(--muted-2);margin:-6px 0 12px;">Meta de cada dia. <strong>00:00 = folga</strong>.</p>
+        <div class="escala-grid">
+          <div class="escala-dia"><label>Dom</label><input type="time" id="eMetaDom" class="form-input" /></div>
+          <div class="escala-dia"><label>Seg</label><input type="time" id="eMetaSeg" class="form-input" /></div>
+          <div class="escala-dia"><label>Ter</label><input type="time" id="eMetaTer" class="form-input" /></div>
+          <div class="escala-dia"><label>Qua</label><input type="time" id="eMetaQua" class="form-input" /></div>
+          <div class="escala-dia"><label>Qui</label><input type="time" id="eMetaQui" class="form-input" /></div>
+          <div class="escala-dia"><label>Sex</label><input type="time" id="eMetaSex" class="form-input" /></div>
+          <div class="escala-dia"><label>Sáb</label><input type="time" id="eMetaSab" class="form-input" /></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Documentos -->
+      <div class="func-tab-panel" id="mtab-documentos">
+        <div class="func-section-label">Documentação</div>
+        <div class="func-grid">
+          <div class="func-group">
+            <label class="func-label">CPF</label>
+            <input type="text" id="eCpf" class="form-input" placeholder="000.000.000-00"
+                   maxlength="14" oninput="funcMascaraCpf(this)" />
+            <span class="func-error" id="err-eCpf"></span>
+          </div>
+          <div class="func-group">
+            <label class="func-label">RG</label>
+            <input type="text" id="eRg" class="form-input" maxlength="12" oninput="funcMascaraRg(this)" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Cartão SUS</label>
+            <input type="text" id="eCartaoSus" class="form-input" maxlength="19" oninput="funcMascaraSus(this)" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Carteira de Trabalho</label>
+            <input type="text" id="eCarteiraTrab" class="form-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Endereço -->
+      <div class="func-tab-panel" id="mtab-endereco">
+        <div class="func-section-label">Endereço</div>
+        <div class="func-grid">
+          <div class="func-group">
+            <label class="func-label">CEP</label>
+            <input type="text" id="eCep" class="form-input" maxlength="9"
+                   oninput="funcMascaraCep(this)"
+                   onblur="funcBuscarCep(this.value, 'e')" />
+          </div>
+          <div class="func-group func-span-2">
+            <label class="func-label">Rua</label>
+            <input type="text" id="eRua" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Número</label>
+            <input type="text" id="eNum" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Bairro</label>
+            <input type="text" id="eBairro" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Cidade</label>
+            <input type="text" id="eCidade" class="form-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Emergência -->
+      <div class="func-tab-panel" id="mtab-emergencia">
+        <div class="func-section-label">Contato de Emergência</div>
+        <div class="func-grid">
+          <div class="func-group func-span-2">
+            <label class="func-label">Nome</label>
+            <input type="text" id="eContatoNome" class="form-input" />
+          </div>
+          <div class="func-group">
+            <label class="func-label">Telefone</label>
+            <input type="tel" id="eContatoTel" class="form-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Férias -->
+      <div class="func-tab-panel" id="mtab-ferias">
+        <div class="func-section-label">Período de Férias</div>
+        <p class="func-ferias-intro">
+          Clique nos dias do calendário para marcar o período de férias.
+          Os dias marcados ficam abonados e travados na Gestão de Ponto —
+          para desmarcar, clique de novo no dia aqui e salve.
+        </p>
+
+        <div class="func-ferias-nav">
+          <button type="button" class="btn-secondary func-ferias-btn-sm" id="btnFeriasMesAnterior">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <span class="func-ferias-mes-label" id="feriasMesLabel">—</span>
+          <button type="button" class="btn-secondary func-ferias-btn-sm" id="btnFeriasProximoMes">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="func-ferias-calendario" id="feriasCalendario">
+          <div class="func-ferias-carregando">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Carregando...
+          </div>
+        </div>
+
+        <div class="func-ferias-rodape">
+          <span id="feriasResumo">0 dias selecionados</span>
+          <span class="func-ferias-dica">As alterações são salvas junto com "Salvar Alterações", no rodapé do modal.</span>
+        </div>
+
+        <div id="feriasErro" class="func-ferias-erro" style="display:none;"></div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="func-modal-footer">
+      <button class="btn-secondary" id="funcModalCancelar">Cancelar</button>
+      <button class="btn-primary" id="btnSalvarEdicao">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span id="btnSalvarEdicaoLabel">Salvar Alterações</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── ESTILOS LOCAIS ─────────────────────────── -->
+<style>
+  /* Formulário */
+  .func-form-titulo { font-size:16px; font-weight:600; color:var(--text); }
+  .func-req { color:#ef4444; }
+  .func-label { font-size:13px; font-weight:500; color:var(--text-soft); display:block; margin-bottom:6px; }
+  .func-error { font-size:11.5px; color:#ef4444; margin-top:3px; display:block; min-height:16px; }
+  .func-group { display:flex; flex-direction:column; }
+  .func-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .func-span-2 { grid-column:span 2; }
+  .escala-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
+  .escala-dia { display:flex; flex-direction:column; gap:4px; }
+  .escala-dia label { font-size:11px; font-weight:600; color:var(--muted); text-align:center; text-transform:uppercase; letter-spacing:.4px; }
+  .escala-dia .form-input { padding:6px 4px; font-size:13px; text-align:center; }
+  .func-section-label {
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--brand); margin-bottom:14px; padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
+  .func-form-erro {
+    display:flex; align-items:center; gap:8px;
+    background:var(--tint-red); border:1px solid var(--tint-red); border-radius: 0;
+    padding:10px 14px; color:var(--fg-red); font-size:13px; margin-top:14px;
+  }
+
+  /* Abas */
+  .func-tabs { display:flex; gap:4px; border-bottom:2px solid var(--surface-3); margin-bottom:20px; }
+  .func-tab {
+    display:flex; align-items:center; gap:6px;
+    padding:9px 16px; font-size:13px; font-weight:500; color:var(--muted);
+    background:none; border:none; border-bottom:2px solid transparent;
+    cursor:pointer; transition:all .15s; margin-bottom:-2px; font-family:inherit;
+  }
+  .func-tab:hover { color:var(--text-soft); }
+  .func-tab.active { color:var(--brand); border-bottom-color:var(--brand); }
+  .func-tab-panel { display:none; }
+  .func-tab-panel.active { display:block; }
+
+  /* Toolbar da tabela */
+  .card-toolbar {
+    display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;
+  }
+  .func-search-wrap { position:relative; flex:1; min-width:200px; }
+  .func-search-wrap i { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted-2); font-size:13px; pointer-events:none; }
+  .func-search-wrap .form-input { padding-left:34px; width:100%; box-sizing:border-box; }
+
+  /* Tabela */
+  #tabelaFuncionarios { width:100%; border-collapse:collapse; font-size:14px; }
+  #tabelaFuncionarios thead th {
+    text-align:left; padding:10px 14px; font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+    border-bottom:2px solid var(--surface-3); background:var(--surface-2); white-space:nowrap;
+  }
+  #tabelaFuncionarios tbody tr { border-bottom:1px solid var(--surface-3); transition:background .1s; }
+  #tabelaFuncionarios tbody tr:hover { background:var(--surface-2); }
+  #tabelaFuncionarios tbody tr:last-child { border-bottom:none; }
+  #tabelaFuncionarios tbody td { padding:13px 14px; color:var(--text-soft); vertical-align:middle; }
+  .tabela-carregando, .tabela-vazia { text-align:center; padding:48px 20px !important; color:var(--muted-2); }
+  .tabela-vazia i { font-size:32px; display:block; margin-bottom:10px; color:var(--border-strong); }
+  .matricula-cell { font-family:'Courier New',monospace; font-size:12.5px; color:var(--muted); }
+  .acoes-cell { display:flex; gap:6px; justify-content:center; }
+  .btn-acao {
+    width:32px; height:32px; border:1px solid var(--border); border-radius: 0;
+    background:var(--surface); cursor:pointer; display:inline-flex; align-items:center;
+    justify-content:center; font-size:13px; transition:all .15s; color:var(--muted);
+  }
+  .btn-acao.editar:hover  { background:var(--tint-blue); border-color:var(--brand); color:var(--brand); }
+  .btn-acao.excluir:hover { background:var(--tint-red); border-color:#ef4444; color:#ef4444; }
+  .btn-acao:disabled {
+    opacity:.45; cursor:not-allowed; background:var(--surface-2); color:var(--muted-2);
+  }
+  .btn-acao:disabled:hover {
+    border-color:var(--border); background:var(--surface-2); color:var(--muted-2);
+  }
+
+  /* Modal */
+  .func-modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.5); z-index:1000;
+    align-items:flex-start; justify-content:center;
+    padding:24px 16px; overflow-y:auto;
+  }
+  .func-modal-overlay.aberto { display:flex; }
+  .func-modal {
+    background:var(--surface); border-radius: 0; width:100%; max-width:780px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.18); overflow:hidden;
+    animation:funcModalIn .2s ease; margin:auto;
+  }
+  @keyframes funcModalIn {
+    from { opacity:0; transform:translateY(16px) scale(0.98); }
+    to   { opacity:1; transform:translateY(0) scale(1); }
+  }
+  .func-modal-header {
+    background:#1e3a5f; padding:20px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .func-modal-avatar {
+    width:48px; height:48px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; font-weight:700; color:#fff; flex-shrink:0;
+  }
+  .func-modal-nome { font-size:17px; font-weight:700; color:#fff; }
+  .func-modal-sub  { font-size:13px; color:#93c5fd; margin-top:2px; }
+  .func-modal-fechar {
+    width:34px; height:34px; background:rgba(255,255,255,0.15);
+    border:none; border-radius: 0; color:#fff; font-size:16px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background .15s;
+  }
+  .func-modal-fechar:hover { background:rgba(255,255,255,0.25); }
+  .func-modal-tabs { border-bottom:2px solid var(--surface-3); margin-bottom:0; padding:0 24px; }
+  .func-modal-body { padding:24px; overflow-y:auto; max-height:60vh; }
+  .func-modal-footer {
+    padding:16px 24px; border-top:1px solid var(--surface-3);
+    display:flex; justify-content:flex-end; gap:10px;
+  }
+
+  /* Responsivo */
+  @media (max-width:860px) {
+    .func-grid { grid-template-columns:repeat(2,1fr); }
+    .func-span-2 { grid-column:span 2; }
+  }
+  @media (max-width:560px) {
+    .escala-grid { grid-template-columns:repeat(4,1fr); }
+    .func-grid { grid-template-columns:1fr; }
+    .func-span-2 { grid-column:span 1; }
+    .func-tab span { display:none; }
+  }
+</style>
+<!-- ── Modal de visualização (somente leitura, para acesso PADRÃO) ── -->
+<div class="func-view-overlay" id="funcViewOverlay">
+  <div class="func-view-modal">
+    <button class="func-view-fechar" id="funcViewFechar" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+    <div id="funcViewCorpo"></div>
+  </div>
+</div>
+
+<style>
+  /* Linha clicável da tabela */
+  .func-linha-click { cursor: pointer; transition: background .12s; }
+  .func-linha-click:hover { background: var(--surface-2); }
+
+  /* Funcionário inativo: cinza, "congelado" */
+  .func-linha-inativa { filter: grayscale(1); opacity: 0.55; }
+  .func-linha-inativa:hover { opacity: 0.75; }
+
+  /* Modal de visualização (acesso padrão) */
+  .func-view-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 20px;
+  }
+  .func-view-overlay.aberto { display: flex; }
+  .func-view-modal {
+    background: var(--surface); border-radius: 0; width: min(100%, 420px);
+    padding: 24px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  }
+  .func-view-fechar {
+    position: absolute; top: 12px; right: 12px; background: none; border: none;
+    font-size: 18px; color: var(--muted-2); cursor: pointer;
+  }
+  .func-view-header { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .func-view-avatar {
+    width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; color: #fff; font-weight: 700; font-size: 18px; flex: 0 0 auto;
+  }
+  .func-view-nome { font-size: 18px; font-weight: 600; color: var(--text); }
+  .func-view-linha {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 11px 0; border-top: 1px solid var(--surface-3); font-size: 14px;
+  }
+  .func-view-linha span { color: var(--muted); }
+  .func-view-linha strong { color: var(--text); font-weight: 500; text-align: right; }
+  /* Aba Férias */
+  .func-ferias-intro { color:var(--text-soft); font-size:13px; line-height:1.6; margin:0 0 16px; }
+  .func-ferias-nav { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:14px; }
+  .func-ferias-mes-label { font-size:14px; font-weight:600; color:var(--text); min-width:150px; text-align:center; }
+  .func-ferias-btn-sm { padding:6px 12px; font-size:13px; }
+  .func-ferias-calendario {
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px;
+    margin-bottom:14px; min-height:120px;
+  }
+  .func-ferias-carregando { grid-column:1/-1; text-align:center; color:var(--text-soft); padding:20px; font-size:13px; }
+  .func-ferias-dow {
+    text-align:center; font-size:11px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.4px; color:var(--muted); padding-bottom:4px;
+  }
+  .func-ferias-dia {
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--border); border-radius:0; background:var(--surface-2);
+    color:var(--text); font-size:13px; cursor:pointer; user-select:none;
+  }
+  .func-ferias-dia:hover { background:var(--surface-3); }
+  .func-ferias-dia.vazio { visibility:hidden; cursor:default; }
+  .func-ferias-dia.selecionado { background:#5EEAD4; border-color:#14B8A6; color:#134E4A; font-weight:700; }
+  .func-ferias-rodape {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding-top:12px; border-top:1px solid var(--border);
+  }
+  .func-ferias-rodape span { font-size:13px; color:var(--text-soft); }
+  .func-ferias-dica { font-size:12px; color:var(--muted-2); font-style:italic; }
+  .func-ferias-erro {
+    margin-top:10px; padding:10px 14px; font-size:13px; color:var(--fg-red);
+    background:var(--tint-red); border:1px solid var(--tint-red);
+  }
+</style>

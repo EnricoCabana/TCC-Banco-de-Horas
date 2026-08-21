@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CronaSys</title>
+
+  <!-- Ícone do site -->
+  <link rel="icon" type="image/png" href="img/icon.png" />
+
+  <!-- FontAwesome via CDN -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Tipografia do logo e dos títulos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap" rel="stylesheet" />
+
+  <!-- Folha de estilos principal -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Tema claro/escuro: aplica antes de renderizar (evita piscar) -->
+  <script src="js/tema.js"></script>
+</head>
+<body class="auth-locked">
+
+  <!-- ================================================
+       SIDEBAR
+  ================================================ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-logo">
+      <img src="img/logo-cronasys-navy.png" alt="CronaSys" class="sidebar-logo-full" />
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <p class="nav-section-label">Principal</p>
+        <ul>
+          <li><a href="#" class="nav-item active" data-page="dashboard" onclick="navegar('dashboard', this)"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a></li>
+          <li><a href="#" class="nav-item" data-page="banco-horas" onclick="navegar('banco-horas', this)"><i class="fa-solid fa-piggy-bank"></i><span>Banco de Horas</span></a></li>
+          <li><a href="#" class="nav-item" data-page="avisos" onclick="navegar('avisos', this)"><i class="fa-solid fa-bell"></i><span>Avisos</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <p class="nav-section-label">Controle de Ponto</p>
+        <ul>
+          <li><a href="#" class="nav-item" data-page="gestao" data-role="admin" onclick="navegar('gestao', this)"><i class="fa-solid fa-table-list"></i><span>Gestão de Ponto</span></a></li>
+          <li><a href="#" class="nav-item" data-page="fechamento" data-role="admin" onclick="navegar('fechamento', this)"><i class="fa-solid fa-file-excel"></i><span>Fechamento</span></a></li>
+          <li><a href="#" class="nav-item" data-page="feriados" onclick="navegar('feriados', this)"><i class="fa-solid fa-calendar-day"></i><span>Feriados</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <p class="nav-section-label">Companhia</p>
+        <ul>
+          <li><a href="#" class="nav-item" id="menuFuncionarios" data-page="funcionarios" onclick="navegar('funcionarios', this)"><i class="fa-solid fa-users"></i><span>Funcionários</span></a></li>
+          <li><a href="#" class="nav-item" data-page="setores" data-role="admin" onclick="navegar('setores', this)"><i class="fa-solid fa-sitemap"></i><span>Setores</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <p class="nav-section-label">Relatórios</p>
+        <ul>
+          <li><a href="#" class="nav-item" data-page="relatorio" data-role="admin" onclick="navegar('relatorio', this)"><i class="fa-solid fa-chart-pie"></i><span>Relatórios</span></a></li>
+          <li><a href="#" class="nav-item" data-page="envio-fichas" data-role="admin" onclick="navegar('envio-fichas', this)"><i class="fa-solid fa-paper-plane"></i><span>Enviar Fichas</span></a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <p class="nav-section-label">Sistema</p>
+        <ul>
+          <li><a href="#" class="nav-item" data-page="auditoria" data-role="admin" onclick="navegar('auditoria', this)"><i class="fa-solid fa-clipboard-list"></i><span>Auditoria</span></a></li>
+          <li><a href="#" class="nav-item" data-page="config-email" data-role="admin" onclick="navegar('config-email', this)"><i class="fa-solid fa-gear"></i><span>Config. E-mail</span></a></li>
+          <li><a href="#" class="nav-item" data-page="backup" data-role="admin" onclick="navegar('backup', this)"><i class="fa-solid fa-database"></i><span>Backup</span></a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="sidebar-profile">
+      <div class="profile-avatar" id="profileAvatar" title="Meu perfil" style="cursor:pointer;" onclick="navegar('perfil')">--</div>
+      <div class="profile-info" title="Meu perfil" style="cursor:pointer;" onclick="navegar('perfil')">
+        <span class="profile-name" id="profileName">--</span>
+        <span class="profile-role" id="profileRole">--</span>
+      </div>
+      <a href="#" class="profile-logout" id="profileLogout" title="Sair">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ================================================
+       ÁREA PRINCIPAL
+  ================================================ -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="main-wrapper">
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-title">
+          <i class="fa-solid fa-gauge-high" id="topbarTitleIcon"></i>
+          <span id="topbarTitle">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-bell" id="topbarBell" title="Avisos" aria-label="Avisos" onclick="navegar('avisos')">
+          <i class="fa-solid fa-bell"></i>
+          <span class="topbar-bell-dot" id="topbarBellDot"></span>
+        </button>
+        <span class="topbar-date" id="topbarDate"></span>
+        <div class="topbar-avatar" id="topbarAvatar" title="Meu perfil" onclick="navegar('perfil')">--</div>
+      </div>
+    </header>
+
+    <main id="content">
+      <div class="loading-initial">
+        <i class="fa-solid fa-clock-rotate-left fa-spin"></i>
+        <p>Carregando...</p>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ================================================
+       SCRIPTS
+       Todos os módulos são carregados aqui UMA VEZ.
+       O main.js chama a função de init de cada módulo
+       após cada navegação — sem depender de re-execução
+       de <script> dentro do innerHTML.
+  ================================================ -->
+  <script src="js/calculoPonto.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/funcionarios.js"></script>
+  <script src="js/gestao.js"></script>
+  <script src="js/avisos.js"></script>
+
+  <!-- main.js deve ser o ÚLTIMO — ele dispara a navegação inicial -->
+  <script src="js/feriados.js"></script>
+  <script src="js/setores.js"></script>
+  <script src="js/fechamento.js"></script>
+  <script src="js/auditoria.js"></script>
+  <script src="js/perfil.js"></script>
+  <script src="js/config-email.js"></script>
+  <script src="js/envio-fichas.js"></script>
+  <script src="js/relatorio.js"></script>
+  <script src="js/banco-horas.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!-- ================================================
+     paginas/dashboard.html
+     Visao inicial por perfil.
+================================================ -->
+
+<div class="page-header dash-header">
+  <div>
+    <h1 id="dashTitulo">Dashboard</h1>
+    <p id="dashSubtitulo">Resumo do mês atual</p>
+  </div>
+</div>
+
+<div class="dash-admin-tabs" id="dashAdminTabs" style="display:none;">
+  <button type="button" class="dash-admin-tab active" data-dash-tab="geral">
+    <i class="fa-solid fa-chart-line"></i>
+    <span>Visão geral</span>
+  </button>
+  <button type="button" class="dash-admin-tab" data-dash-tab="minha">
+    <i class="fa-solid fa-calendar-days"></i>
+    <span>Minha ficha</span>
+  </button>
+  <button type="button" class="dash-admin-tab" data-dash-tab="equipe">
+    <i class="fa-solid fa-users"></i>
+    <span>Equipe</span>
+  </button>
+</div>
+
+<section class="dash-kpis" id="dashKpis">
+  <div class="dash-kpi">
+    <span class="dash-kpi-icon azul"><i class="fa-regular fa-clock"></i></span>
+    <div>
+      <small id="dashKpiTotalLabel">Total trabalhado</small>
+      <strong id="dashKpiTotal">00:00</strong>
+    </div>
+  </div>
+
+  <div class="dash-kpi">
+    <span class="dash-kpi-icon verde"><i class="fa-solid fa-scale-balanced"></i></span>
+    <div>
+      <small>Saldo do mês</small>
+      <strong id="dashKpiSaldo" class="dash-saldo neutro">+00:00</strong>
+    </div>
+  </div>
+
+  <div class="dash-kpi">
+    <span class="dash-kpi-icon azul"><i class="fa-solid fa-piggy-bank"></i></span>
+    <div>
+      <small id="dashKpiBancoLabel">Saldo total</small>
+      <strong id="dashKpiBanco" class="dash-saldo neutro">+00:00</strong>
+    </div>
+  </div>
+
+  <div class="dash-kpi">
+    <span class="dash-kpi-icon roxo"><i class="fa-solid fa-calendar-check"></i></span>
+    <div>
+      <small id="dashKpiRegistroLabel">Dias com registro</small>
+      <strong id="dashKpiRegistros">0</strong>
+    </div>
+  </div>
+
+  <div class="dash-kpi">
+    <span class="dash-kpi-icon laranja"><i class="fa-solid fa-triangle-exclamation"></i></span>
+    <div>
+      <small id="dashKpiAlertaLabel">Faltas</small>
+      <strong id="dashKpiAlertas">0</strong>
+    </div>
+  </div>
+</section>
+
+<section class="dash-self-section" id="dashMinhaArea" style="display:none;">
+  <div class="dash-section-heading">
+    <div>
+      <h2>Minha ficha mensal</h2>
+      <p>Seus dados individuais no mês atual</p>
+    </div>
+    <button class="btn-secondary dash-panel-action" id="dashMinhaFichaBtn">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Ver minha ficha</span>
+    </button>
+  </div>
+
+  <div class="dash-self-kpis">
+    <div class="dash-kpi dash-kpi-compact">
+      <span class="dash-kpi-icon azul"><i class="fa-regular fa-clock"></i></span>
+      <div>
+        <small>Total trabalhado</small>
+        <strong id="dashMeuTotal">00:00</strong>
+      </div>
+    </div>
+
+    <div class="dash-kpi dash-kpi-compact">
+      <span class="dash-kpi-icon verde"><i class="fa-solid fa-scale-balanced"></i></span>
+      <div>
+        <small>Saldo do mês</small>
+        <strong id="dashMeuSaldo" class="dash-saldo neutro">+00:00</strong>
+      </div>
+    </div>
+
+    <div class="dash-kpi dash-kpi-compact">
+      <span class="dash-kpi-icon azul"><i class="fa-solid fa-piggy-bank"></i></span>
+      <div>
+        <small>Saldo total</small>
+        <strong id="dashMeuBanco" class="dash-saldo neutro">+00:00</strong>
+      </div>
+    </div>
+
+    <div class="dash-kpi dash-kpi-compact">
+      <span class="dash-kpi-icon roxo"><i class="fa-solid fa-calendar-check"></i></span>
+      <div>
+        <small>Dias com registro</small>
+        <strong id="dashMeuRegistros">0</strong>
+      </div>
+    </div>
+
+    <div class="dash-kpi dash-kpi-compact">
+      <span class="dash-kpi-icon laranja"><i class="fa-solid fa-triangle-exclamation"></i></span>
+      <div>
+        <small>Faltas</small>
+        <strong id="dashMeuAlertas">0</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-self-grid">
+    <article class="dash-panel">
+      <div class="dash-panel-header">
+        <div>
+          <h2 id="dashMeuHojeTitulo">Meu dia hoje</h2>
+          <p id="dashMeuHojeSub">--</p>
+        </div>
+        <span class="dash-badge" id="dashMeuHojeBadge">--</span>
+      </div>
+
+      <div class="dash-hours" id="dashMeuHojeHoras"></div>
+    </article>
+
+    <article class="dash-panel">
+      <div class="dash-panel-header">
+        <div>
+          <h2>Meus últimos registros</h2>
+          <p>Dias com lançamento no mês</p>
+        </div>
+      </div>
+
+      <div class="dash-day-list" id="dashMeuHistoricoLista"></div>
+    </article>
+  </div>
+</section>
+
+<section class="dash-grid" id="dashGrid">
+  <article class="dash-panel dash-today-panel" id="dashHojePanel">
+    <div class="dash-panel-header">
+      <div>
+        <h2 id="dashHojeTitulo">Hoje</h2>
+        <p id="dashHojeSub">--</p>
+      </div>
+      <span class="dash-badge" id="dashHojeBadge">--</span>
+    </div>
+
+    <div class="dash-hours" id="dashHojeHoras"></div>
+  </article>
+
+  <article class="dash-panel" id="dashEquipePanel">
+    <div class="dash-panel-header">
+      <div>
+        <h2>Equipe</h2>
+        <p id="dashEquipeSub">Resumo por colaborador</p>
+      </div>
+      <span class="dash-badge" id="dashEquipeBadge">0</span>
+    </div>
+
+    <div class="dash-team-list" id="dashEquipeLista"></div>
+  </article>
+
+  <article class="dash-panel" id="dashHistoricoPanel">
+    <div class="dash-panel-header">
+      <div>
+        <h2 id="dashHistoricoTitulo">Últimos registros</h2>
+        <p id="dashHistoricoSub">Dias com lançamento no mês</p>
+      </div>
+      <button class="btn-secondary dash-panel-action" id="dashAcaoPrincipal">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span>Ver ficha</span>
+      </button>
+    </div>
+
+    <div class="dash-day-list" id="dashHistoricoLista"></div>
+  </article>
+</section>
+
+<style>
+  .dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .dash-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .dash-admin-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: -6px 0 18px;
+    padding: 6px;
+    width: fit-content;
+    max-width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+  }
+
+  .dash-admin-tab {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .dash-admin-tab:hover {
+    background: var(--surface-3);
+    color: var(--text-soft);
+  }
+
+  .dash-admin-tab.active {
+    background: #1e3a5f;
+    color: #ffffff;
+  }
+
+  .dash-kpi {
+    min-height: 92px;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .dash-kpi-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .dash-kpi-icon.azul { background: var(--tint-blue); color: var(--brand-press); }
+  .dash-kpi-icon.verde { background: var(--tint-green); color: #16a34a; }
+  .dash-kpi-icon.roxo { background: var(--tint-purple); color: var(--fg-purple); }
+  .dash-kpi-icon.laranja { background: var(--tint-orange); color: #ea580c; }
+
+  .dash-kpi small {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .dash-kpi strong {
+    color: var(--text);
+    font-size: 23px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dash-saldo.positivo { color: #16a34a; }
+  .dash-saldo.negativo { color: #dc2626; }
+  .dash-saldo.neutro { color: var(--muted); }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(360px, 1.1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .dash-grid.dash-grid-single {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-self-section {
+    margin-bottom: 16px;
+  }
+
+  .dash-section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 2px 0 12px;
+  }
+
+  .dash-section-heading h2 {
+    color: var(--text);
+    font-size: 17px;
+    margin-bottom: 3px;
+  }
+
+  .dash-section-heading p {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .dash-self-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .dash-kpi-compact {
+    min-height: 82px;
+    padding: 15px 16px;
+  }
+
+  .dash-self-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(360px, 1.1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .dash-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .dash-today-panel {
+    min-height: 260px;
+  }
+
+  .dash-panel-header {
+    min-height: 74px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .dash-panel-header h2 {
+    color: var(--text);
+    font-size: 16px;
+    margin-bottom: 3px;
+  }
+
+  .dash-panel-header p {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .dash-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 10px;
+    border-radius: 0;
+    background: var(--surface-3);
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .dash-badge.positivo {
+    background: var(--tint-green);
+    color: var(--fg-green);
+  }
+
+  .dash-badge.negativo {
+    background: var(--tint-red);
+    color: var(--fg-red);
+  }
+
+  .dash-badge.alerta {
+    background: var(--tint-amber);
+    color: var(--fg-amber);
+  }
+
+  .dash-hours {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 18px 20px 20px;
+  }
+
+  .dash-hour-box {
+    min-height: 66px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--surface-2);
+    display: grid;
+    align-content: center;
+    gap: 5px;
+  }
+
+  .dash-hour-box small {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .dash-hour-box strong {
+    color: var(--text);
+    font-size: 16px;
+    font-family: 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dash-hour-box.total strong {
+    color: var(--fg-blue);
+  }
+
+  .dash-hour-box.saldo strong.positivo { color: var(--fg-green); }
+  .dash-hour-box.saldo strong.negativo { color: #dc2626; }
+  .dash-hour-box.saldo strong.neutro { color: var(--muted); }
+
+  .dash-team-list,
+  .dash-day-list {
+    display: grid;
+  }
+
+  .dash-team-row,
+  .dash-day-row {
+    display: grid;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--surface-3);
+  }
+
+  .dash-team-row:last-child,
+  .dash-day-row:last-child {
+    border-bottom: none;
+  }
+
+  .dash-team-row {
+    grid-template-columns: minmax(180px, 1fr) 92px 92px 92px;
+    align-items: center;
+  }
+
+  /* Linha da equipe tem 4 indicadores (Total, Saldo Mês, Saldo Total, Registros) */
+  .dash-team-row.dash-team-equipe {
+    grid-template-columns: minmax(180px, 1fr) 92px 92px 92px 92px;
+  }
+
+  .dash-person {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dash-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--brand);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .dash-person strong,
+  .dash-day-main strong {
+    display: block;
+    color: var(--text);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dash-person span,
+  .dash-day-main span,
+  .dash-metric small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .dash-metric {
+    text-align: right;
+  }
+
+  .dash-metric strong {
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dash-metric strong.positivo { color: var(--fg-green); }
+  .dash-metric strong.negativo { color: #dc2626; }
+  .dash-metric strong.neutro { color: var(--muted); }
+
+  .dash-day-row {
+    grid-template-columns: 54px minmax(180px, 1fr) 90px 90px;
+    align-items: center;
+  }
+
+  .dash-day-date {
+    width: 44px;
+    height: 44px;
+    border-radius: 0;
+    background: var(--surface-3);
+    display: grid;
+    place-items: center;
+    align-content: center;
+  }
+
+  .dash-day-date strong {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .dash-day-date span {
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  .dash-day-row.sabado .dash-day-date {
+    background: var(--tint-blue-strong);
+  }
+
+  .dash-day-row.domingo .dash-day-date {
+    background: var(--tint-amber-strong);
+  }
+
+  .dash-empty {
+    min-height: 140px;
+    padding: 32px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--muted-2);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .dash-empty i {
+    color: var(--brand);
+    font-size: 20px;
+  }
+
+  .dash-panel-action {
+    padding: 7px 12px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 1100px) {
+    .dash-kpis {
+      grid-template-columns: repeat(2, minmax(160px, 1fr));
+    }
+
+    .dash-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dash-self-kpis {
+      grid-template-columns: repeat(2, minmax(160px, 1fr));
+    }
+
+    .dash-self-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .dash-header,
+    .dash-section-heading,
+    .dash-panel-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .dash-kpis,
+    .dash-self-kpis,
+    .dash-hours {
+      grid-template-columns: 1fr;
+    }
+
+    .dash-admin-tabs {
+      width: 100%;
+    }
+
+    .dash-admin-tab {
+      flex: 1;
+      padding: 8px 10px;
+    }
+
+    .dash-team-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .dash-team-row.dash-team-equipe {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .dash-person {
+      grid-column: 1 / -1;
+    }
+
+    .dash-day-row {
+      grid-template-columns: 48px 1fr;
+    }
+
+    .dash-day-row .dash-metric {
+      text-align: left;
+    }
+  }
+</style>

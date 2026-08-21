@@ -1,0 +1,140 @@
+<!-- ================================================
+     paginas/feriados.html
+     Injetado em <main id="content"> pelo main.js.
+     O main.js chama iniciarModuloFeriados() após injetar.
+================================================ -->
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1>Feriados</h1>
+      <p>Gestão de feriados do ano · tabela <code>feriados</code></p>
+    </div>
+    <div class="fer-ano-wrap">
+      <label for="ferAno">Ano</label>
+      <select id="ferAno" class="form-input"></select>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADICIONAR FERIADO (apenas admin) ───────── -->
+<div class="card" id="ferCardAdd" style="margin-bottom:20px;">
+  <div class="fer-section-label">Adicionar feriado</div>
+  <div class="fer-add-grid">
+    <div class="fer-group">
+      <label class="fer-label">Data</label>
+      <input type="date" id="ferData" class="form-input" />
+    </div>
+    <div class="fer-group">
+      <label class="fer-label">Descrição</label>
+      <input type="text" id="ferDescricao" class="form-input"
+             placeholder="Ex: Recesso escolar" autocomplete="off" />
+    </div>
+    <div class="fer-group">
+      <label class="fer-label">Tipo</label>
+      <select id="ferTipo" class="form-input">
+        <option value="NACIONAL">Nacional</option>
+        <option value="ESTADUAL">Estadual</option>
+        <option value="MUNICIPAL">Municipal</option>
+      </select>
+    </div>
+    <div class="fer-group fer-add-btn">
+      <button class="btn-primary" id="btnAddFeriado">
+        <i class="fa-solid fa-plus"></i> <span id="btnAddFeriadoLabel">Adicionar</span>
+      </button>
+    </div>
+  </div>
+  <p class="fer-dica">
+    <i class="fa-solid fa-circle-info"></i>
+    No dia de um feriado, a meta de todos os funcionários vira 00:00 automaticamente.
+    Quem trabalhar nesse dia acumula tudo como saldo positivo.
+  </p>
+  <div id="ferErro" class="fer-erro" style="display:none;">
+    <i class="fa-solid fa-circle-exclamation"></i> <span id="ferErroMsg"></span>
+  </div>
+</div>
+
+<!-- ── LISTA DE FERIADOS ──────────────────────── -->
+<div class="card">
+  <div class="fer-toolbar">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <strong id="ferTituloLista">Feriados</strong>
+      <select id="ferMes" class="form-input fer-mes-select"></select>
+    </div>
+    <span id="ferTotal" style="font-size:13px;color:var(--muted-2);">– feriados</span>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table id="tabelaFeriados">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Dia da semana</th>
+          <th>Descrição</th>
+          <th>Tipo</th>
+          <th id="ferThAcoes" style="text-align:center;">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="corpoFeriados">
+        <tr>
+          <td colspan="4" class="fer-carregando">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Carregando...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── ESTILOS LOCAIS ─────────────────────────── -->
+<style>
+  .fer-ano-wrap { display:flex; align-items:center; gap:10px; }
+  .fer-ano-wrap label { font-size:13px; font-weight:600; color:var(--text-soft); }
+  .fer-ano-wrap .form-input { width:120px; }
+
+  .fer-section-label {
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--brand); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);
+  }
+  .fer-add-grid { display:grid; grid-template-columns:200px 1fr auto; gap:14px; align-items:end; }
+  .fer-group { display:flex; flex-direction:column; }
+  .fer-label { font-size:13px; font-weight:500; color:var(--text-soft); margin-bottom:6px; }
+  .fer-add-btn { justify-content:flex-end; }
+  .fer-add-btn .btn-primary { height:42px; }
+  .fer-dica { font-size:12px; color:var(--muted-2); margin:14px 0 0; display:flex; gap:8px; align-items:flex-start; }
+  .fer-erro {
+    display:flex; align-items:center; gap:8px;
+    background:var(--tint-red); border:1px solid var(--tint-red); border-radius: 0;
+    padding:10px 14px; color:var(--fg-red); font-size:13px; margin-top:14px;
+  }
+
+  .fer-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .fer-mes-select { width:auto; padding:6px 10px; font-size:13px; }
+
+  #tabelaFeriados { width:100%; border-collapse:collapse; font-size:14px; }
+  #tabelaFeriados thead th {
+    text-align:left; padding:10px 14px; font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+    border-bottom:2px solid var(--surface-3); background:var(--surface-2); white-space:nowrap;
+  }
+  #tabelaFeriados tbody tr { border-bottom:1px solid var(--surface-3); transition:background .1s; }
+  #tabelaFeriados tbody tr:hover { background:var(--surface-2); }
+  #tabelaFeriados tbody tr:last-child { border-bottom:none; }
+  #tabelaFeriados tbody td { padding:13px 14px; color:var(--text-soft); vertical-align:middle; }
+  .fer-carregando, .fer-vazia { text-align:center; padding:48px 20px !important; color:var(--muted-2); }
+  .fer-vazia i { font-size:32px; display:block; margin-bottom:10px; color:var(--border-strong); }
+
+  .fer-acoes { display:flex; gap:6px; justify-content:center; }
+  .fer-acoes .btn-acao {
+    width:32px; height:32px; border:1px solid var(--border); border-radius: 0;
+    background:var(--surface); cursor:pointer; display:inline-flex; align-items:center;
+    justify-content:center; font-size:13px; transition:all .15s; color:var(--muted);
+  }
+  .fer-acoes .btn-acao.excluir:hover { background:var(--tint-red); border-color:#ef4444; color:#ef4444; }
+
+  @media (max-width:640px) {
+    .fer-add-grid { grid-template-columns:1fr; }
+    .fer-add-btn { justify-content:stretch; }
+    .fer-add-btn .btn-primary { width:100%; }
+  }
+</style>

@@ -1,0 +1,96 @@
+<!-- ================================================
+     paginas/envio-fichas.html
+     Enviar fichas mensais por e-mail (admin).
+     main.js chama iniciarModuloEnvioFichas().
+================================================ -->
+
+<div class="page-header">
+  <div>
+    <h1>Enviar Fichas por E-mail</h1>
+    <p>Envie a ficha do mês (com saldo e PDF) para os funcionários selecionados</p>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:20px;">
+  <div class="ef-controles">
+    <div class="ef-campo">
+      <label>Mês</label>
+      <select id="efMes" class="form-input">
+        <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+        <option value="3">Março</option><option value="4">Abril</option>
+        <option value="5">Maio</option><option value="6">Junho</option>
+        <option value="7">Julho</option><option value="8">Agosto</option>
+        <option value="9">Setembro</option><option value="10">Outubro</option>
+        <option value="11">Novembro</option><option value="12">Dezembro</option>
+      </select>
+    </div>
+    <div class="ef-campo">
+      <label>Ano</label>
+      <select id="efAno" class="form-input"></select>
+    </div>
+    <div class="ef-campo ef-campo-cresce">
+      <label>Buscar funcionário</label>
+      <input type="text" id="efBusca" class="form-input" placeholder="nome..." autocomplete="off" />
+    </div>
+    <div class="ef-campo">
+      <label>Setor</label>
+      <select id="efSetor" class="form-input"><option value="">Todos</option></select>
+    </div>
+  </div>
+
+  <div class="ef-barra-sel">
+    <label class="ef-check-todos">
+      <input type="checkbox" id="efTodos" /> <span>Selecionar todos</span>
+    </label>
+    <span id="efContador" class="ef-contador">0 selecionados</span>
+  </div>
+
+  <div id="efLista" class="ef-lista">
+    <div class="ef-vazio"><i class="fa-solid fa-circle-notch fa-spin"></i> Carregando funcionários...</div>
+  </div>
+
+  <div id="efAviso" class="ef-aviso">
+    <i class="fa-solid fa-circle-info"></i>
+    <span>Para o envio funcionar, o "Ativar envio de e-mail" precisa estar marcado em <b>Config. E-mail</b>.</span>
+  </div>
+
+  <div class="ef-acoes">
+    <button class="btn-primary" id="btnEfEnviar"><i class="fa-solid fa-paper-plane"></i> Enviar ficha(s)</button>
+  </div>
+</div>
+
+<div id="efResultados" class="card" style="display:none;">
+  <div class="ef-section-label">Resultado do envio</div>
+  <div id="efResumo" class="ef-resumo"></div>
+  <div id="efResultadoLista"></div>
+</div>
+
+<style>
+  .ef-controles { display:grid; grid-template-columns:140px 110px 1fr 180px; gap:14px; margin-bottom:16px; }
+  .ef-campo { display:flex; flex-direction:column; }
+  .ef-campo label { font-size:13px; font-weight:500; color:var(--text-soft); margin-bottom:6px; }
+  .ef-barra-sel { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .ef-check-todos { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--text-soft); cursor:pointer; }
+  .ef-check-todos input { width:16px; height:16px; }
+  .ef-contador { font-size:13px; color:var(--muted); font-weight:500; }
+  .ef-lista { max-height:420px; overflow-y:auto; margin:4px 0; }
+  .ef-item { display:flex; align-items:center; gap:12px; padding:10px 6px; border-bottom:1px solid var(--surface-3); }
+  .ef-item input[type=checkbox] { width:16px; height:16px; flex:0 0 auto; }
+  .ef-item.sem-email { opacity:.55; }
+  .ef-avatar { width:36px; height:36px; border-radius:50%; flex:0 0 auto; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:13px; }
+  .ef-info { display:flex; flex-direction:column; min-width:0; }
+  .ef-nome { font-size:14px; font-weight:500; color:var(--text); }
+  .ef-sub { font-size:12px; color:var(--muted); }
+  .ef-sub.sem { color:#dc2626; }
+  .ef-tag-setor { margin-left:auto; font-size:11px; background:var(--surface-3); color:var(--text-soft); padding:3px 10px; border-radius: 0; white-space:nowrap; }
+  .ef-vazio { text-align:center; color:var(--muted-2); padding:24px; font-size:14px; }
+  .ef-aviso { display:flex; align-items:center; gap:8px; background:var(--tint-blue); border:1px solid var(--tint-blue-strong); color:var(--fg-blue); border-radius: 0; padding:10px 14px; font-size:13px; margin:14px 0; }
+  .ef-acoes { display:flex; justify-content:flex-end; }
+  .ef-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--brand); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .ef-resumo { font-size:14px; font-weight:600; margin-bottom:12px; }
+  .ef-res-item { display:flex; align-items:center; gap:10px; padding:8px 6px; border-bottom:1px solid var(--surface-3); font-size:14px; }
+  .ef-res-item .ok { color:#16a34a; } .ef-res-item .falha { color:#dc2626; }
+  .ef-res-erro { color:var(--muted-2); font-size:12px; margin-left:auto; }
+
+  @media (max-width:680px) { .ef-controles { grid-template-columns:1fr 1fr; } .ef-campo-cresce { grid-column:span 2; } }
+</style>

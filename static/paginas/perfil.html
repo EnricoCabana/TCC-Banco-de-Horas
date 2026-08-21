@@ -1,0 +1,125 @@
+<!-- ================================================
+     paginas/perfil.html
+     Injetado em <main id="content"> pelo main.js.
+     Acessado clicando no usuário (canto inferior da barra lateral).
+     main.js chama iniciarModuloPerfil() após injetar.
+================================================ -->
+
+<div class="page-header">
+  <h1>Meu Perfil</h1>
+  <p>Seus dados pessoais. Matrícula, cargo e escala são gerenciados pelo RH.</p>
+</div>
+
+<div class="card">
+  <!-- Topo: avatar + infos fixas -->
+  <div class="perfil-topo">
+    <div class="perfil-avatar-wrap">
+      <div class="perfil-avatar" id="perfilAvatar">--</div>
+      <div class="perfil-foto-botoes">
+        <button class="btn-secondary" id="btnTrocarFoto"><i class="fa-solid fa-camera"></i> Trocar foto</button>
+        <button class="perfil-btn-remover" id="btnRemoverFoto" style="display:none;">Remover</button>
+        <input type="file" id="perfilFotoInput" accept="image/*" hidden />
+      </div>
+    </div>
+    <div class="perfil-meta">
+      <div class="perfil-chip"><small>Matrícula</small><strong id="perfilMatricula">—</strong></div>
+      <div class="perfil-chip"><small>Cargo</small><strong id="perfilCargo">—</strong></div>
+      <div class="perfil-chip"><small>Setor</small><strong id="perfilSetor">—</strong></div>
+      <div class="perfil-chip"><small>Acesso</small><strong id="perfilAcesso">—</strong></div>
+    </div>
+  </div>
+
+  <!-- Dados pessoais -->
+  <div class="perfil-section-label">Dados pessoais</div>
+  <div class="perfil-grid">
+    <div class="perfil-group">
+      <label>Nome completo</label>
+      <input type="text" id="perfilNome" class="form-input" autocomplete="name" />
+    </div>
+    <div class="perfil-group">
+      <label>E-mail</label>
+      <input type="email" id="perfilEmail" class="form-input" autocomplete="email" />
+    </div>
+    <div class="perfil-group">
+      <label>Telefone / Celular</label>
+      <input type="text" id="perfilCelular" class="form-input" placeholder="(11) 90000-0000" autocomplete="tel"
+             maxlength="16" oninput="funcMascaraCelular(this)" />
+    </div>
+    <div class="perfil-group">
+      <label>Aniversário</label>
+      <input type="date" id="perfilAniversario" class="form-input" />
+    </div>
+  </div>
+
+  <!-- Senha -->
+  <div class="perfil-section-label">
+    Trocar senha
+    <small style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-2);">(opcional — deixe vazio para manter)</small>
+  </div>
+  <div class="perfil-grid">
+    <div class="perfil-group">
+      <label>Nova senha</label>
+      <input type="password" id="perfilSenha" class="form-input" autocomplete="new-password" placeholder="mínimo 8 caracteres" />
+    </div>
+    <div class="perfil-group">
+      <label>Confirmar nova senha</label>
+      <input type="password" id="perfilSenha2" class="form-input" autocomplete="new-password" />
+    </div>
+  </div>
+
+  <div id="perfilErro" class="perfil-erro" style="display:none;">
+    <i class="fa-solid fa-circle-exclamation"></i> <span id="perfilErroMsg"></span>
+  </div>
+
+  <div class="perfil-acoes">
+    <button class="btn-primary" id="btnSalvarPerfil">
+      <i class="fa-solid fa-floppy-disk"></i> Salvar alterações
+    </button>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <div class="perfil-section-label" style="margin-top:0;border-bottom:none;padding-bottom:0;">Aparência</div>
+  <div class="aparencia-linha">
+    <div>
+      <strong class="aparencia-titulo">Tema do site</strong>
+      <span class="aparencia-desc">Vale para todas as telas. Sua escolha fica salva neste navegador.</span>
+    </div>
+    <div class="segmento" id="seletorTema">
+      <button type="button" data-tema="light">Claro</button>
+      <button type="button" data-tema="dark">Escuro</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .perfil-topo { display:flex; align-items:center; gap:24px; flex-wrap:wrap; padding-bottom:20px; margin-bottom:20px; border-bottom:1px solid var(--border); }
+  .perfil-avatar-wrap { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .perfil-avatar {
+    width:96px; height:96px; border-radius:50%; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,var(--brand),#1e3a5f); color:#fff;
+    font-size:34px; font-weight:700; flex-shrink:0;
+  }
+  .perfil-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+  .perfil-foto-botoes { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .perfil-btn-remover { background:none; border:none; color:#dc2626; font-size:12px; cursor:pointer; text-decoration:underline; }
+
+  .perfil-meta { display:flex; gap:28px; flex-wrap:wrap; }
+  .perfil-chip { display:flex; flex-direction:column; gap:3px; }
+  .perfil-chip small { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted-2); }
+  .perfil-chip strong { font-size:15px; color:var(--text); }
+
+  .perfil-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--brand); margin:6px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .perfil-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+  .perfil-group { display:flex; flex-direction:column; }
+  .perfil-group label { font-size:13px; font-weight:500; color:var(--text-soft); margin-bottom:6px; }
+
+  .perfil-erro { display:flex; align-items:center; gap:8px; background:var(--tint-red); border:1px solid var(--tint-red); color:var(--fg-red); border-radius: 0; padding:10px 14px; font-size:13px; margin-bottom:16px; }
+  .perfil-acoes { display:flex; justify-content:flex-end; }
+
+  @media (max-width:560px) {
+    .perfil-grid { grid-template-columns:1fr; }
+    .perfil-topo { flex-direction:column; align-items:flex-start; }
+  }
+</style>
