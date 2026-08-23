@@ -15,10 +15,11 @@ Sistema web de **controle de ponto e banco de horas** desenvolvido como Trabalho
 - **Relatórios em PDF** e impressão de fichas
 - **Envio de fichas por e-mail** para os funcionários
 - **Avisos** internos (gerais, importantes e comemorativos, públicos ou privados) com selo de "Novo"
+- **Solicitações de ajuste**: funcionário pede correção de ponto (data + tipo de ocorrência + mensagem) e o RH aprova ou nega, com abas de Pendentes/Aprovados/Negados
 - **Funcionários**: cadastro com escala flexível por dia da semana e opção "isento de ponto"
 - **Setores**: organização e ativação/inativação
 - **Feriados** por ano
-- **Backup do banco**: download, restauração e envio por e-mail
+- **Backup do banco**: download e restauração (com verificação de integridade por hash)
 - **Auditoria**: trilha de quem criou, editou ou excluiu cada registro
 - **Perfil** com foto e troca de senha
 - Tema **claro/escuro** e confirmações de segurança com senha para ações críticas
@@ -53,7 +54,7 @@ Requisição → Router → Middleware → Controller → Service → DAO → My
 ## Estrutura de pastas
 
 ```
-CRONASYS-main/
+TCC-Banco-de-Horas-main/
 ├── index.js              # Ponto de entrada
 ├── Server.js             # Configuração do Express e injeção de dependências
 ├── .env.example          # Modelo das variáveis de ambiente

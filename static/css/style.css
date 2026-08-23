@@ -408,7 +408,7 @@ body.auth-locked .main-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px 12px;
+  padding: 9px 20px 9px;
   font-size: 18px;
   color: #374151;
   flex-shrink: 0;
@@ -429,7 +429,7 @@ body.auth-locked .main-wrapper {
 
 /* Logotipo completo (sempre navy, n&atilde;o troca com o tema) */
 .sidebar-logo-full {
-  height: 32px;
+  height: 38px;
   width: auto;
   display: block;
   flex-shrink: 0;

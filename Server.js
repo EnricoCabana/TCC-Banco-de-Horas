@@ -15,6 +15,7 @@ const SetorDAO = require("./api/dao/SetorDAO");
 const FechamentoDAO = require("./api/dao/FechamentoDAO");
 const AuditoriaDAO = require("./api/dao/AuditoriaDAO");
 const ConfiguracaoSmtpDAO = require("./api/dao/ConfiguracaoSmtpDAO");
+const SolicitacaoDAO = require("./api/dao/SolicitacaoDAO");
 
 const AuthService = require("./api/services/AuthService");
 const PermissoesService = require("./api/services/PermissoesService");
@@ -29,12 +30,14 @@ const PerfilService = require("./api/services/PerfilService");
 const EmailService = require("./api/services/EmailService");
 const FichaEmailService = require("./api/services/FichaEmailService");
 const BackupService = require("./api/services/BackupService");
+const SolicitacoesService = require("./api/services/SolicitacoesService");
 
 const AuthMiddleware = require("./api/middleware/AuthMiddleware");
 const AuthPermissoesMiddleware = require("./api/middleware/AuthPermissoesMiddleware");
 const FuncionariosMiddleware = require("./api/middleware/FuncionariosMiddleware");
 const AvisosMiddleware = require("./api/middleware/AvisosMiddleware");
 const PontoMiddleware = require("./api/middleware/PontoMiddleware");
+const SolicitacoesMiddleware = require("./api/middleware/SolicitacoesMiddleware");
 
 const AuthController = require("./api/controllers/AuthController");
 const FuncionariosController = require("./api/controllers/FuncionariosController");
@@ -48,6 +51,7 @@ const PerfilController = require("./api/controllers/PerfilController");
 const EmailController = require("./api/controllers/EmailController");
 const FichaEmailController = require("./api/controllers/FichaEmailController");
 const BackupController = require("./api/controllers/BackupController");
+const SolicitacoesController = require("./api/controllers/SolicitacoesController");
 
 const AuthRouter = require("./api/routes/AuthRouter");
 const FuncionariosRouter = require("./api/routes/FuncionariosRouter");
@@ -61,6 +65,7 @@ const PerfilRouter = require("./api/routes/PerfilRouter");
 const EmailRouter = require("./api/routes/EmailRouter");
 const FichaEmailRouter = require("./api/routes/FichaEmailRouter");
 const BackupRouter = require("./api/routes/BackupRouter");
+const SolicitacoesRouter = require("./api/routes/SolicitacoesRouter");
 
 module.exports = class Server {
     #porta;
@@ -75,6 +80,7 @@ module.exports = class Server {
     #fechamentoDAO;
     #auditoriaDAO;
     #configSmtpDAO;
+    #solicitacaoDAO;
 
     #authService;
     #permissoesService;
@@ -89,12 +95,14 @@ module.exports = class Server {
     #emailService;
     #fichaEmailService;
     #backupService;
+    #solicitacoesService;
 
     #authMiddleware;
     #authPermissoesMiddleware;
     #funcionariosMiddleware;
     #avisosMiddleware;
     #pontoMiddleware;
+    #solicitacoesMiddleware;
 
     #authController;
     #funcionariosController;
@@ -108,6 +116,7 @@ module.exports = class Server {
     #emailController;
     #fichaEmailController;
     #backupController;
+    #solicitacoesController;
 
     constructor(porta) {
         this.#porta = porta || process.env.PORT || 3000;
@@ -153,6 +162,7 @@ module.exports = class Server {
         this.#fechamentoDAO = new FechamentoDAO(this.#database);
         this.#auditoriaDAO = new AuditoriaDAO(this.#database);
         this.#configSmtpDAO = new ConfiguracaoSmtpDAO(this.#database);
+        this.#solicitacaoDAO = new SolicitacaoDAO(this.#database);
         this.#auditoriaService = new AuditoriaService(this.#auditoriaDAO);
         this.#perfilService = new PerfilService(this.#usuarioDAO, this.#auditoriaService);
         this.#emailService = new EmailService(this.#configSmtpDAO, this.#auditoriaService);
@@ -166,12 +176,14 @@ module.exports = class Server {
         this.#feriadosService = new FeriadosService(this.#feriadoDAO, this.#auditoriaService);
         this.#setorService = new SetorService(this.#setorDAO, this.#auditoriaService);
         this.#fechamentoService = new FechamentoService(this.#fechamentoDAO, this.#auditoriaService);
+        this.#solicitacoesService = new SolicitacoesService(this.#solicitacaoDAO, this.#auditoriaService);
 
         this.#authMiddleware = new AuthMiddleware();
         this.#authPermissoesMiddleware = new AuthPermissoesMiddleware(this.#permissoesService);
         this.#funcionariosMiddleware = new FuncionariosMiddleware();
         this.#avisosMiddleware = new AvisosMiddleware();
         this.#pontoMiddleware = new PontoMiddleware();
+        this.#solicitacoesMiddleware = new SolicitacoesMiddleware();
 
         this.#authController = new AuthController(this.#authService);
         this.#funcionariosController = new FuncionariosController(this.#funcionariosService);
@@ -185,6 +197,7 @@ module.exports = class Server {
         this.#emailController = new EmailController(this.#emailService);
         this.#fichaEmailController = new FichaEmailController(this.#fichaEmailService);
         this.#backupController = new BackupController(this.#backupService);
+        this.#solicitacoesController = new SolicitacoesController(this.#solicitacoesService);
     };
 
     #setupRoutes = () => {
@@ -236,6 +249,11 @@ module.exports = class Server {
             this.#authPermissoesMiddleware,
             this.#backupController
         );
+        const solicitacoesRouter = new SolicitacoesRouter(
+            this.#authPermissoesMiddleware,
+            this.#solicitacoesMiddleware,
+            this.#solicitacoesController
+        );
 
         this.#app.use("/api/auth", authRouter.createRoutes());
         this.#app.use("/api", funcionariosRouter.createRoutes());
@@ -249,6 +267,7 @@ module.exports = class Server {
         this.#app.use("/api", emailRouter.createRoutes());
         this.#app.use("/api", fichaEmailRouter.createRoutes());
         this.#app.use("/api", backupRouter.createRoutes());
+        this.#app.use("/api", solicitacoesRouter.createRoutes());
     };
 
     #setupErrorMiddleware = () => {

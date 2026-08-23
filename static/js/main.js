@@ -21,6 +21,7 @@ const TITULOS = {
   'banco-horas':  'Banco de Horas',
   'funcionarios': 'Funcionários',
   'avisos':       'Avisos',
+  'solicitacoes': 'Solicitações',
   'gestao':       'Gestão de Ponto',
   'relatorio':    'Relatórios Mensais',
   'feriados':     'Feriados',
@@ -39,6 +40,7 @@ const ICONES = {
   'banco-horas':  'fa-solid fa-piggy-bank',
   'funcionarios': 'fa-solid fa-users',
   'avisos':       'fa-solid fa-bell',
+  'solicitacoes': 'fa-solid fa-file-signature',
   'gestao':       'fa-solid fa-table-list',
   'relatorio':    'fa-solid fa-chart-pie',
   'feriados':     'fa-solid fa-calendar-day',
@@ -62,6 +64,7 @@ const INIT_MAP = {
   'gestao':       () => iniciarModuloGestao(),
   'banco-horas':  () => iniciarModuloBancoHoras(),
   'avisos':       () => iniciarModuloAvisos(),
+  'solicitacoes': () => iniciarModuloSolicitacoes(),
   'relatorio':    () => iniciarModuloRelatorio(),
   'feriados':     () => iniciarModuloFeriados(),
   'setores':      () => iniciarModuloSetores(),
@@ -331,10 +334,10 @@ function paginaPermitida(pagina) {
     return false;
   }
   if (usuarioEhAdmin()) {
-    return ['dashboard', 'banco-horas', 'funcionarios', 'setores', 'gestao', 'feriados', 'fechamento', 'auditoria', 'config-email', 'backup', 'envio-fichas', 'avisos', 'relatorio', 'perfil'].includes(pagina);
+    return ['dashboard', 'banco-horas', 'funcionarios', 'setores', 'gestao', 'feriados', 'fechamento', 'auditoria', 'config-email', 'backup', 'envio-fichas', 'avisos', 'solicitacoes', 'relatorio', 'perfil'].includes(pagina);
   }
 
-  return ['dashboard', 'banco-horas', 'funcionarios', 'feriados', 'avisos', 'perfil'].includes(pagina);
+  return ['dashboard', 'banco-horas', 'funcionarios', 'feriados', 'avisos', 'solicitacoes', 'perfil'].includes(pagina);
 }
 
 function linkPadrao() {

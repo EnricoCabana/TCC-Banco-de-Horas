@@ -368,9 +368,12 @@
   .rel-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 0; padding: 20px;
-    cursor: pointer; transition: all 0.18s;
+    cursor: pointer; transition: background-color 0.15s;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     position: relative; overflow: hidden;
+  }
+  .rel-card:hover {
+    background: var(--surface-2);
   }
   .rel-card::before {
     content: ''; position: absolute;
@@ -381,11 +384,6 @@
   .rel-card.saldo-negativo::before { background: #dc2626; }
   .rel-card.saldo-neutro::before   { background: var(--muted-2); }
   .rel-card.sem-dados::before      { background: var(--border-strong); }
-  .rel-card:hover {
-    border-color: var(--brand);
-    box-shadow: 0 4px 16px rgba(59,130,246,0.12);
-    transform: translateY(-2px);
-  }
 
   .rel-card-topo { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
   .rel-card-avatar {

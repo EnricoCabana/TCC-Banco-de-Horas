@@ -1,16 +1,21 @@
 -- =============================================================
 -- PROJETO: CronaSys - Gestão de Banco de Horas
--- VERSÃO: 11.0 - Escala flexível (7 metas) + cálculo no Node + feriados 2026
+-- VERSÃO: 12.0 - Escala flexível (7 metas) + cálculo no Node + feriados 2026
 -- =============================================================
 --
--- MUDANÇAS DESTA VERSÃO (Item 1):
---   1. A tabela `usuarios` agora tem uma meta por dia da semana
+-- MUDANÇAS DESTA VERSÃO:
+--   1. A tabela `usuarios` tem uma meta por dia da semana
 --      (meta_dom ... meta_sab), permitindo escalas flexíveis.
 --      Folga = 0 minutos naquele dia; 4h = 240; 8h = 480.
---   2. Os triggers NÃO calculam mais horas. Quem calcula é o Node
---      (camada Service). Os triggers só protegem meses fechados.
+--   2. Quem calcula as horas é o Node (camada Service). Os dois
+--      triggers abaixo só protegem meses já fechados contra edição
+--      (é a única regra de negócio que mora no banco).
 --   3. Os feriados nacionais de 2026 já vêm cadastrados. Em um feriado,
 --      o cálculo (no Node) zera a meta do dia automaticamente.
+--   4. Script simplificado: sem stored procedure e sem views (nenhuma
+--      das duas era usada pelo Node — o fechamento de mês e as
+--      consultas de relatório já são feitos em JS, então elas só
+--      duplicavam lógica sem servir pra nada).
 -- =============================================================
 
 SET NAMES utf8mb4;
@@ -119,6 +124,21 @@ CREATE TABLE ponto (
     UNIQUE KEY (id_usuario, data_ref)
 );
 
+CREATE TABLE solicitacoes (
+    id_solicitacao    INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario        INT NOT NULL,
+    data_ref          DATE NOT NULL,
+    id_ocorrencia     INT NOT NULL,
+    mensagem          VARCHAR(255) NOT NULL,
+    status            ENUM('Pendente', 'Aprovado', 'Negado') NOT NULL DEFAULT 'Pendente',
+    id_aprovador      INT,
+    data_solicitacao  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_resposta     TIMESTAMP NULL,
+    CONSTRAINT fk_solicitacao_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    CONSTRAINT fk_solicitacao_ocorrencia FOREIGN KEY (id_ocorrencia) REFERENCES tipos_ocorrencia(id_ocorrencia),
+    CONSTRAINT fk_solicitacao_aprovador FOREIGN KEY (id_aprovador) REFERENCES usuarios(id_usuario)
+);
+
 CREATE TABLE avisos (
     id_aviso      INT PRIMARY KEY AUTO_INCREMENT,
     titulo        VARCHAR(200) NOT NULL,
@@ -157,19 +177,7 @@ CREATE TABLE auditoria (
     valor_antigo  VARCHAR(255),
     valor_novo    VARCHAR(255),
     executor_id   INT,
-    executor_nome VARCHAR(100),
-    INDEX idx_auditoria_data (data_registro),
-    INDEX idx_auditoria_entidade (entidade)
-);
-
-CREATE TABLE logs_importacao (
-    id_log INT PRIMARY KEY AUTO_INCREMENT,
-    data_importacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    nome_arquivo VARCHAR(255),
-    usuario_rh INT,
-    status ENUM('SUCESSO', 'ERRO') DEFAULT 'SUCESSO',
-    observacao TEXT,
-    FOREIGN KEY (usuario_rh) REFERENCES usuarios(id_usuario)
+    executor_nome VARCHAR(100)
 );
 
 -- Configuração de SMTP (envio de e-mail) — uma única linha (id_config = 1)
@@ -283,73 +291,7 @@ END$$
 DELIMITER ;
 
 -- -----------------------------------------------------
--- 7. PROCEDIMENTOS
--- -----------------------------------------------------
-
-DELIMITER $$
-
-CREATE PROCEDURE sp_fechar_mes(IN p_id_user INT, IN p_mes INT, IN p_ano INT)
-BEGIN
-    DECLARE v_saldo_mes INT;
-    DECLARE v_saldo_anterior INT DEFAULT 0;
-
-    SELECT SUM(saldo_dia_minutos) INTO v_saldo_mes FROM ponto
-    WHERE id_usuario = p_id_user AND MONTH(data_ref) = p_mes AND YEAR(data_ref) = p_ano;
-
-    SELECT saldo_acumulado_minutos INTO v_saldo_anterior FROM fechamentos_mensais
-    WHERE id_usuario = p_id_user ORDER BY ano_ref DESC, mes_ref DESC LIMIT 1;
-
-    INSERT INTO fechamentos_mensais (id_usuario, mes_ref, ano_ref, saldo_mes_minutos, saldo_acumulado_minutos)
-    VALUES (p_id_user, p_mes, p_ano, v_saldo_mes, (IFNULL(v_saldo_anterior, 0) + v_saldo_mes))
-    ON DUPLICATE KEY UPDATE
-        saldo_mes_minutos = VALUES(saldo_mes_minutos),
-        saldo_acumulado_minutos = VALUES(saldo_acumulado_minutos);
-
-    UPDATE ponto SET fechado = TRUE
-    WHERE id_usuario = p_id_user AND MONTH(data_ref) = p_mes AND YEAR(data_ref) = p_ano;
-END$$
-
-DELIMITER ;
-
--- -----------------------------------------------------
--- 8. VISUALIZAÇÕES (VIEWS)
--- -----------------------------------------------------
-
-CREATE OR REPLACE VIEW v_espelho_ponto AS
-SELECT
-    u.nome AS 'Funcionario',
-    s.nome_setor AS 'Setor',
-    DATE_FORMAT(p.data_ref, '%d/%m/%Y') AS 'Data',
-    oc.descricao AS 'Ocorrencia',
-    TIME_FORMAT(p.ent1, '%H:%i') AS 'Ent1',
-    TIME_FORMAT(p.sai1, '%H:%i') AS 'Sai1',
-    TIME_FORMAT(p.ent2, '%H:%i') AS 'Ent2',
-    TIME_FORMAT(p.sai2, '%H:%i') AS 'Sai2',
-    CONCAT(IF(p.saldo_dia_minutos >= 0, '+', '-'),
-           LPAD(FLOOR(ABS(p.saldo_dia_minutos)/60), 2, '0'), ':',
-           LPAD(MOD(ABS(p.saldo_dia_minutos), 60), 2, '0')) AS 'Saldo',
-    p.justificativa AS 'Justificativa',
-    IF(p.comprovante_url IS NOT NULL, 'Sim', 'Não') AS 'Anexo'
-FROM ponto p
-INNER JOIN usuarios u ON p.id_usuario = u.id_usuario
-LEFT JOIN setores s ON u.id_setor = s.id_setor
-INNER JOIN tipos_ocorrencia oc ON p.id_ocorrencia = oc.id_ocorrencia;
-
-CREATE OR REPLACE VIEW v_saldo_dashboard AS
-SELECT
-    u.id_usuario,
-    u.nome,
-    s.nome_setor,
-    IFNULL((SELECT saldo_acumulado_minutos FROM fechamentos_mensais f
-            WHERE f.id_usuario = u.id_usuario ORDER BY ano_ref DESC, mes_ref DESC LIMIT 1), 0)
-    + IFNULL((SELECT SUM(saldo_dia_minutos) FROM ponto p
-              WHERE p.id_usuario = u.id_usuario AND p.fechado = FALSE), 0) AS saldo_total_minutos
-FROM usuarios u
-LEFT JOIN setores s ON u.id_setor = s.id_setor
-WHERE u.ativo = TRUE;
-
--- -----------------------------------------------------
--- 9. ACESSOS E DADOS DE EXEMPLO
+-- 7. ACESSOS E DADOS DE EXEMPLO
 -- -----------------------------------------------------
 -- Senhas criptografadas com bcrypt. O hash abaixo corresponde à senha '123'
 -- (entre com '123'; o login compara via bcrypt.compare).
@@ -373,3 +315,99 @@ VALUES
     (2, '2026-05-05', '08:05:00', '12:00:00', '13:00:00', '17:10:00', 1, 480, 485, 5),
     (2, '2026-05-09', NULL, NULL, NULL, NULL,
      (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Folga' LIMIT 1), 240, 0, 0);
+
+-- -----------------------------------------------------
+-- 8. PONTO DE JULHO/2026 (FUN-001) - dados para os prints
+--     das Figuras 1 e 2 do artigo: mês fechado, com saldos
+--     diários positivos e negativos e vários tipos de
+--     ocorrência (Normal, Atestado, Folga, Treinamento,
+--     Falta Justificada, Falta Não Justificada e
+--     Licença Nojo/Luto).
+-- -----------------------------------------------------
+
+INSERT INTO ponto
+    (id_usuario, data_ref, ent1, sai1, ent2, sai2, id_ocorrencia, meta_do_dia, total_dia_minutos, saldo_dia_minutos)
+VALUES
+    -- Sábado 04/07: Folga (ocorrência explícita)
+    (2, '2026-07-04', NULL, NULL, NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Folga' LIMIT 1), 240, 0, 0),
+    -- Segunda 06/07: Normal, jornada exata
+    (2, '2026-07-06', '08:00:00', '12:00:00', '13:00:00', '17:00:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 480, 0),
+    -- Terça 07/07: Normal, com 1h de hora extra (saldo positivo)
+    (2, '2026-07-07', '08:00:00', '12:00:00', '13:00:00', '18:00:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 540, 60),
+    -- Quinta 09/07: Normal, jornada exata
+    (2, '2026-07-09', '08:00:00', '12:00:00', '13:00:00', '17:00:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 480, 0),
+    -- Sexta 10/07: Falta Não Justificada (saldo bem negativo)
+    (2, '2026-07-10', NULL, NULL, NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Falta Não Justificada' LIMIT 1), 480, 0, -480),
+    -- Sábado 11/07: Normal, jornada exata (meta reduzida de sábado)
+    (2, '2026-07-11', '08:00:00', '12:00:00', NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 240, 240, 0),
+    -- Segunda 13/07: Atestado (abonado)
+    (2, '2026-07-13', NULL, NULL, NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Atestado' LIMIT 1), 480, 0, 0),
+    -- Terça 14/07: Normal, jornada exata
+    (2, '2026-07-14', '08:00:00', '12:00:00', '13:00:00', '17:00:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 480, 0),
+    -- Quinta 16/07: Normal, chegou atrasado (saldo negativo)
+    (2, '2026-07-16', '08:30:00', '12:00:00', '13:00:00', '17:00:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 450, -30),
+    -- Sexta 17/07: Treinamento (abonado)
+    (2, '2026-07-17', NULL, NULL, NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Treinamento' LIMIT 1), 480, 0, 0),
+    -- Sábado 18/07: Normal, jornada exata
+    (2, '2026-07-18', '08:00:00', '12:00:00', NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 240, 240, 0),
+    -- Segunda 20/07: Falta Justificada (não abona, saldo negativo)
+    (2, '2026-07-20', NULL, NULL, NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Falta Justificada' LIMIT 1), 480, 0, -480),
+    -- Terça 21/07: Normal, com 1h30 de hora extra (saldo bem positivo)
+    (2, '2026-07-21', '08:00:00', '12:00:00', '13:00:00', '18:30:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 570, 90),
+    -- Quinta 23/07: Licença Nojo/Luto (abonado)
+    (2, '2026-07-23', NULL, NULL, NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Licença Nojo/Luto' LIMIT 1), 480, 0, 0),
+    -- Sexta 24/07: Normal, jornada exata
+    (2, '2026-07-24', '08:00:00', '12:00:00', '13:00:00', '17:00:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 480, 0),
+    -- Sábado 25/07: Falta Não Justificada
+    (2, '2026-07-25', NULL, NULL, NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Falta Não Justificada' LIMIT 1), 240, 0, -240),
+    -- Segunda 27/07: Normal, jornada exata
+    (2, '2026-07-27', '08:00:00', '12:00:00', '13:00:00', '17:00:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 480, 0),
+    -- Terça 28/07: Normal, com 45min de hora extra (saldo positivo)
+    (2, '2026-07-28', '08:00:00', '12:00:00', '13:00:00', '17:45:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 525, 45),
+    -- Quinta 30/07: Meio Período (trabalhou só a manhã, resto abonado)
+    (2, '2026-07-30', '08:00:00', '12:00:00', NULL, NULL,
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Meio Período' LIMIT 1), 480, 240, 0),
+    -- Sexta 31/07: Normal, chegou atrasado e saiu mais cedo (saldo negativo)
+    (2, '2026-07-31', '08:15:00', '12:00:00', '13:00:00', '16:45:00',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1), 480, 420, -60);
+
+-- -----------------------------------------------------
+-- 9. SOLICITAÇÕES DE EXEMPLO
+-- -----------------------------------------------------
+-- Uma de cada status, só pra a tela de Solicitações não nascer vazia.
+
+INSERT INTO solicitacoes (id_usuario, data_ref, id_ocorrencia, mensagem, status, id_aprovador, data_resposta)
+VALUES
+    -- Pendente: ainda esperando o RH analisar.
+    (2, '2026-08-05',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Atestado' LIMIT 1),
+     'Esqueci de anexar o atestado médico no dia, segue para lançamento.',
+     'Pendente', NULL, NULL),
+    -- Aprovada pelo administrador (id_usuario 1).
+    (2, '2026-07-16',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Trabalho Normal' LIMIT 1),
+     'Bati o ponto de saída errado, cheguei às 08:30 e não 08:00.',
+     'Aprovado', 1, '2026-07-17 09:10:00'),
+    -- Negada pelo administrador.
+    (2, '2026-07-10',
+     (SELECT id_ocorrencia FROM tipos_ocorrencia WHERE descricao = 'Falta Justificada' LIMIT 1),
+     'Falta no dia 10/07, favor justificar como consulta médica.',
+     'Negado', 1, '2026-07-11 14:20:00');
